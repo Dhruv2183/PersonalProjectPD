@@ -483,7 +483,7 @@
   .intro-persist{
     position:fixed; inset:0; pointer-events:none;
     z-index:6;
-    transition: opacity 10s linear;
+    transition: opacity 2.5s ease;
   }
   body.flowers-settle .intro-persist{ opacity:0; }
 
@@ -1380,6 +1380,59 @@
   .closing .rsvp{margin-top:2em; font-size:13px; color:var(--ink-soft);}
   .footer-note{margin-top:3em; font-size:11px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase;}
 
+  /* ===== Mobile readability — bump up the small text on phones ===== */
+  @media (max-width: 640px){
+    .hero h1{ font-size: clamp(42px, 11vw, 68px); }
+    .hero .surname{ font-size: 18px; }
+    .hero .date{ font-size: 13px; letter-spacing: .3em; }
+    .hero .shubh{ font-size: 18px; }
+    .hero .eyebrow{ font-size: 12px; }
+
+    .section-eyebrow{ font-size: 12px; }
+    .section-title{ font-size: clamp(28px, 7vw, 38px); }
+    .section-sub{ font-size: 15.5px; line-height:1.65; }
+
+    .letter .salutation{ font-size: 30px; }
+    .letter .body{ font-size: 17px; line-height: 1.75; }
+    .letter .signature{ font-size: 24px; }
+    .letter .family{ font-size: 12px; }
+
+    .pullquote blockquote{ font-size: 24px; line-height: 1.45; }
+    .pullquote cite{ font-size: 22px; }
+
+    .cd-num{ font-size: 42px; }
+    .cd-lbl{ font-size: 11px; letter-spacing:.25em; }
+
+    .day-head .d-title{ font-size: 30px; }
+    .day-head .d-tag{ font-size: 20px; }
+    .day-head .d-meta{ font-size: 15.5px; }
+
+    .stop .ribbon{ font-size: 17px; }
+    .stop .t{ font-size: 11.5px; }
+    .stop h4{ font-size: 20px; }
+    .stop p{ font-size: 16px; line-height: 1.65; }
+    .stop .ven{ font-size: 13px; }
+
+    .venue-card .v-name{ font-size: 26px; }
+    .venue-card .v-addr{ font-size: 16px; line-height: 1.65; }
+
+    .btn{ font-size: 13px; padding: 13px 22px; }
+
+    .wish-section .section-sub{ font-size: 16px; }
+    .wish-envelope .env-letter-inner{ font-size: 16.5px; line-height: 1.75; }
+    .env-hint{ font-size: 17px; }
+
+    .closing h2{ font-size: 32px; }
+    .closing .couple{ font-size: 28px; }
+    .closing .rsvp{ font-size: 14px; }
+
+    .event .ev-ribbon{ font-size: 18px; }
+    .event .ev-time{ font-size: 12px; }
+    .event h3{ font-size: 24px; }
+    .event .ev-desc{ font-size: 16px; line-height:1.65; }
+    .event .ev-venue{ font-size: 14px; }
+  }
+
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important; transition:none !important;}
     #cover{display:none;}
@@ -1929,7 +1982,7 @@
         <span class="amp script">&amp;</span>
         <span>Aman</span>
       </h1>
-      <div class="surname">Mathur · Mathur</div>
+      <div class="surname">Mathur</div>
       <div class="date">Wednesday · 25 November 2026 · Jodhpur</div>
     </div>
 
@@ -2929,7 +2982,7 @@
     setTimeout(()=> cover.classList.add('exiting'),            6900);
     setTimeout(()=> { cover.style.display='none'; reveal(); }, 8300);
     // Let the dense shower linger for ~15s after reveal, then fade over 10s
-    setTimeout(()=> document.body.classList.add('flowers-settle'), 8300 + 15000);
+    setTimeout(()=> document.body.classList.add('flowers-settle'), 8300 + 500);
   }
 
   skip.addEventListener('click', () => {
