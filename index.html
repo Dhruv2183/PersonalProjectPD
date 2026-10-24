@@ -2887,7 +2887,6 @@
   const landing = document.getElementById('landing');
   const hero = document.getElementById('heroName');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const seen = sessionStorage.getItem('pa-intro-seen') === '1';
   const mobile = window.matchMedia('(max-width:640px)').matches;
 
   /* ---------- Flower generator ---------- */
@@ -2933,7 +2932,9 @@
     document.body.classList.add('revealed');
     cover.setAttribute('aria-hidden','true');
     landing.setAttribute('aria-hidden','false');
-    sessionStorage.setItem('pa-intro-seen','1');
+    // Also start the dense-flower settle so a Skip / reduced-motion path
+    // doesn't leave the intro layer falling forever.
+    setTimeout(()=> document.body.classList.add('flowers-settle'), 600);
   }
 
   function playIntro(){
@@ -2971,7 +2972,7 @@
   });
   window.addEventListener('keydown', e => { if(e.key==='Escape') skip.click(); });
 
-  if (reduced || seen) {
+  if (reduced) {
     cover.style.display='none';
     reveal();
   } else {
