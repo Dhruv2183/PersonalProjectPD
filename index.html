@@ -1380,21 +1380,26 @@
   .closing .rsvp{margin-top:2em; font-size:13px; color:var(--ink-soft);}
   .footer-note{margin-top:3em; font-size:11px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase;}
 
-  /* Subtle swipe-up hint on the hero */
+  /* Subtle swipe-up hint — bottom-right corner, vertical, out of content path */
   .swipe-hint{
-    position:absolute; left:50%; bottom: calc(min(40svh, 340px) + 14px);
-    transform: translateX(-50%);
-    display:flex; flex-direction:column; align-items:center; gap:4px;
+    position: fixed;
+    right: 14px; bottom: 24px;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
     color: var(--sage-dark);
-    font-size: 10px; letter-spacing:.3em; text-transform: uppercase;
-    opacity:.7; pointer-events:none; z-index:3;
+    font-size: 9px; letter-spacing:.35em; text-transform: uppercase;
+    opacity:.55; pointer-events:none; z-index:7;
     animation: swipeFloat 2.2s ease-in-out infinite;
   }
-  @keyframes swipeFloat{
-    0%,100%{ transform: translate(-50%, 0); opacity:.6; }
-    50%    { transform: translate(-50%, -6px); opacity:1; }
+  .swipe-hint span{
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
   }
-  @media (max-width:640px){ .swipe-hint{ bottom: calc(min(30svh,240px) + 10px); font-size:11px; }}
+  @keyframes swipeFloat{
+    0%,100%{ transform: translateY(0); opacity:.5; }
+    50%    { transform: translateY(-6px); opacity:.85; }
+  }
+  /* fade the hint out once the user scrolls */
+  body.scrolled .swipe-hint{ opacity:0; transition: opacity .5s ease; }
 
   /* ===== Mobile readability — bump up the small text on phones ===== */
   @media (max-width: 640px){
@@ -3056,6 +3061,15 @@
       if (hint) hint.style.display = open ? 'none' : '';
     });
   }
+
+  /* ---------- Fade the swipe hint away once the user scrolls ---------- */
+  let scrolledOnce = false;
+  window.addEventListener('scroll', () => {
+    if (!scrolledOnce && window.scrollY > 40){
+      scrolledOnce = true;
+      document.body.classList.add('scrolled');
+    }
+  }, { passive: true });
 
   /* ---------- Scroll-reveal ---------- */
   const io = new IntersectionObserver((entries)=>{
