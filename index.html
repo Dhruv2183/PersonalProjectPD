@@ -1102,14 +1102,24 @@
   }
   .wish-envelope .env-seal{
     position:absolute; left:50%; top:48%; transform:translate(-50%,-50%);
-    width:88px; height:88px; z-index:5;
+    width:92px; height:92px; z-index:5;
     transition: opacity .4s ease;
     display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 35% 30%, #FFF4D5 0%, #FBE49A 15%, #D4A52C 50%, #8E6A1E 100%);
+    border:2px solid #FBE49A;
+    box-shadow:
+      0 2px 4px rgba(60,40,20,.15),
+      0 8px 20px rgba(138,26,47,.3),
+      inset 0 2px 6px rgba(255,244,194,.6),
+      inset 0 -3px 8px rgba(90,10,25,.3),
+      0 0 0 1px #8E6A1E inset;
   }
   .wish-envelope .env-seal svg{width:100%; height:100%;}
   .wish-envelope .env-seal .seal-om{
-    width:100%; height:100%; object-fit:contain;
-    filter: drop-shadow(0 2px 6px rgba(138,26,47,.35));
+    width:68%; height:68%; object-fit:contain;
+    filter: drop-shadow(0 1px 2px rgba(90,10,25,.5));
   }
   .wish-envelope .env-hint{
     position:absolute; left:50%; bottom:-32px; transform:translateX(-50%);
