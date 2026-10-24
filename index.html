@@ -1102,10 +1102,15 @@
   }
   .wish-envelope .env-seal{
     position:absolute; left:50%; top:48%; transform:translate(-50%,-50%);
-    width:68px; height:68px; z-index:5;
+    width:88px; height:88px; z-index:5;
     transition: opacity .4s ease;
+    display:flex; align-items:center; justify-content:center;
   }
   .wish-envelope .env-seal svg{width:100%; height:100%;}
+  .wish-envelope .env-seal .seal-om{
+    width:100%; height:100%; object-fit:contain;
+    filter: drop-shadow(0 2px 6px rgba(138,26,47,.35));
+  }
   .wish-envelope .env-hint{
     position:absolute; left:50%; bottom:-32px; transform:translateX(-50%);
     font-family:'Dancing Script',cursive; color:var(--bougain); font-size:18px;
@@ -2478,7 +2483,7 @@
                 </svg>
               </div>
               <div class="ribbon">Shubh Aarambh</div>
-              <div class="t">9:00 AM</div>
+              <div class="t">10:00 AM</div>
               <h4>Baane Vinayak</h4>
               <p>With Lord Ganesha's blessings — the week begins in prayer, sweets, and the first smiles of the celebration.</p>
             </div>
@@ -2513,7 +2518,7 @@
                 </svg>
               </div>
               <div class="ribbon">Rhythm &amp; Vows</div>
-              <div class="t">8:00 PM</div>
+              <div class="t">7:00 PM</div>
               <h4>Engagement &amp; Sangeet</h4>
               <p>A musical night of dance, promises exchanged over songs, and two families finally becoming one big, loud, loving story.</p>
             </div>
@@ -2542,7 +2547,7 @@
                 </svg>
               </div>
               <div class="ribbon">Saat Phere</div>
-              <div class="t">9:00 PM</div>
+              <div class="t">8:00 PM</div>
               <h4>Wedding Ceremony</h4>
               <p>Seven vows around the sacred fire. Family, friends, and the whole of Jodhpur's night sky bearing witness as two souls become one.</p>
             </div>
@@ -2580,7 +2585,7 @@
       <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#E85A7A"/></svg>
       <span class="line"></span>
     </div>
-    <p class="section-sub">Jodhpur · 9:00 PM IST — the moment when two souls become one.</p>
+    <p class="section-sub">Jodhpur · 8:00 PM IST — the moment when two souls become one.</p>
 
     <div class="countdown" id="cd" role="timer" aria-live="polite">
       <div class="cd-tile"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Days</span></div>
@@ -2817,17 +2822,7 @@
         </div>
         <div class="env-flap"></div>
         <div class="env-seal glow-pulse" aria-hidden="true">
-          <svg viewBox="0 0 68 68">
-            <defs>
-              <radialGradient id="wSeal" cx="40%" cy="40%" r="60%">
-                <stop offset="0%" stop-color="#D44761"/>
-                <stop offset="100%" stop-color="#8A1A2F"/>
-              </radialGradient>
-            </defs>
-            <circle cx="34" cy="34" r="30" fill="url(#wSeal)"/>
-            <circle cx="34" cy="34" r="26" fill="none" stroke="#D7B872" stroke-width="1" opacity=".7"/>
-            <text x="34" y="43" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="22" font-style="italic" fill="#F8E6B8">P&amp;A</text>
-          </svg>
+          <img src="assets/om-seal.png" alt="" class="seal-om" />
         </div>
         <div class="env-hint">Tap to open ✨</div>
       </button>
@@ -2835,48 +2830,7 @@
 
   </section>
 
-  <!-- ============== CLOSING ============== -->
-  <section class="closing reveal" id="closing">
-    <div class="sparkle-field" id="closingSparkles" aria-hidden="true"></div>
-    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
-    <svg class="mandala-watermark tl" aria-hidden="true" style="top:60px; opacity:.07;"><use href="#mandala"/></svg>
-    <svg class="mandala-watermark br" aria-hidden="true" style="bottom:40px; opacity:.07;"><use href="#mandala"/></svg>
-    <svg class="kalash-left" aria-hidden="true"><use href="#kalash"/></svg>
-    <svg class="kalash-right" aria-hidden="true"><use href="#kalash"/></svg>
-    <svg class="diya-float" style="top:70px; left:12%;" aria-hidden="true"><use href="#diya"/></svg>
-    <svg class="diya-float" style="top:70px; right:12%; animation-delay:-2.2s;" aria-hidden="true"><use href="#diya"/></svg>
-    <svg class="closing-arch" viewBox="0 0 900 300" aria-hidden="true">
-      <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
-        <path d="M100,280 C 200,120 350,40 450,40 C 550,40 700,120 800,280"/>
-        <path d="M140,280 C 220,160 360,80 450,80 C 540,80 680,160 760,280" opacity=".6"/>
-      </g>
-      <g fill="#6C8C5E">
-        <ellipse cx="180" cy="210" rx="22" ry="8" transform="rotate(-40 180 210)"/>
-        <ellipse cx="230" cy="160" rx="22" ry="8" transform="rotate(-55 230 160)"/>
-        <ellipse cx="310" cy="100" rx="22" ry="8" transform="rotate(-70 310 100)"/>
-        <ellipse cx="590" cy="100" rx="22" ry="8" transform="rotate(70 590 100)"/>
-        <ellipse cx="670" cy="160" rx="22" ry="8" transform="rotate(55 670 160)"/>
-        <ellipse cx="720" cy="210" rx="22" ry="8" transform="rotate(40 720 210)"/>
-      </g>
-      <g>
-        <circle cx="200" cy="190" r="12" fill="#E85A7A"/><circle cx="280" cy="120" r="14" fill="#E85A7A"/>
-        <circle cx="360" cy="70" r="12" fill="#E8A33D"/><circle cx="540" cy="70" r="12" fill="#E8A33D"/>
-        <circle cx="620" cy="120" r="14" fill="#E85A7A"/><circle cx="700" cy="190" r="12" fill="#E85A7A"/>
-        <circle cx="450" cy="40" r="10" fill="#B08A4A"/>
-      </g>
-    </svg>
-
-    <div style="position:relative; z-index:2; max-width:720px; margin:0 auto;">
-      <div class="section-ornament">
-        <span class="line"></span>
-        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#B08A4A"/></svg>
-        <span class="line"></span>
-      </div>
-      <p class="couple">— Pooja &amp; Aman —</p>
-      <p class="rsvp">For RSVP &amp; details, please contact the family.</p>
-      <p class="footer-note">Under Auspicious Shaadi Skies · Jodhpur 2026</p>
-    </div>
-  </section>
+  <!-- Closing section removed — site ends at the sealed letter -->
 </main>
 
 <script>
@@ -2978,7 +2932,7 @@
   }
 
   /* ---------- Countdown to 25 Nov 2026, 21:00 IST (15:30 UTC) ---------- */
-  const TARGET = new Date('2026-11-25T15:30:00Z').getTime();
+  const TARGET = new Date('2026-11-25T14:30:00Z').getTime();
   const pad = n => String(n).padStart(2,'0');
   const cdD = document.getElementById('cd-d');
   const cdH = document.getElementById('cd-h');
