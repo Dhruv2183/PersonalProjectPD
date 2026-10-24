@@ -1,0 +1,3040 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Pooja &amp; Aman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#FBF6EE;
+    --ivory-2:#F5EEDE;
+    --paper:#FAF3E3;
+    --paper-2:#F2E7CD;
+    --bougain:#E85A7A;
+    --peach:#F6B5A3;
+    --marigold:#E8A33D;
+    --fire-1:#FFB24A;
+    --fire-2:#FF7A3D;
+    --fire-3:#FFD98A;
+    --sage:#6C8C5E;
+    --sage-dark:#4F6D45;
+    --gold:#B08A4A;
+    --gold-2:#D7B872;
+    --ink:#2B2320;
+    --ink-soft:#5A4A41;
+    --ease: cubic-bezier(.65,.0,.1,1);
+    --ease-soft: cubic-bezier(.4,0,.2,1);
+  }
+  :root:not([data-theme="light"]) { color-scheme: light; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--ivory);color:var(--ink);font-family:'Inter',system-ui,sans-serif;}
+  /* Scrollbar gutter reserved from first paint so the landing never jumps.
+     html is the ONLY scroll container; body never changes its overflow. */
+  html{
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+    min-height: 100%;
+  }
+  body{ overflow-x: hidden; min-height: 100vh; }
+  /* Intro lock: prevents scroll but doesn't change layout, because
+     scrollbar-gutter has already reserved the gutter above. */
+  body:not(.revealed){
+    overflow: hidden;
+    height: 100vh;
+    touch-action: none;
+  }
+  .serif{font-family:'Cormorant Garamond',serif;}
+  .script{font-family:'Dancing Script',cursive;}
+  .deva{font-family:'Tiro Devanagari Hindi',serif;}
+
+  /* ========================================================= */
+  /* COVER                                                      */
+  /* ========================================================= */
+  #cover{
+    position:fixed; inset:0;
+    height:100svh; width:100vw;
+    z-index:9999;
+    background:
+      radial-gradient(ellipse at 50% 25%, #fff9ec 0%, var(--ivory) 55%, #ead9b4 110%);
+    perspective:2200px;
+    perspective-origin:50% 48%;
+    overflow:hidden;
+    opacity:0;
+    animation: coverIn 1s ease forwards;
+  }
+  @keyframes coverIn { to{opacity:1} }
+
+  /* Film-grain paper wash */
+  .paper-grain{
+    position:absolute; inset:0; pointer-events:none; opacity:.14; mix-blend-mode:multiply;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(176,138,74,.09) 0 1px, transparent 2px),
+      radial-gradient(circle at 70% 60%, rgba(176,138,74,.07) 0 1px, transparent 2px),
+      radial-gradient(circle at 40% 80%, rgba(176,138,74,.08) 0 1px, transparent 2px);
+    background-size: 7px 7px, 11px 11px, 13px 13px;
+  }
+
+  /* The card holder — centred, has a card shape and shadow */
+  .card-stage{
+    position:absolute; left:50%; top:50%;
+    width:min(84vw, 760px); height:min(78svh, 900px);
+    transform:translate(-50%,-50%);
+    transform-style:preserve-3d;
+    opacity:0;
+    animation: stageIn 1.4s .3s var(--ease-soft) forwards;
+  }
+  @keyframes stageIn{ from{opacity:0; transform:translate(-50%,-48%) scale(.96)} to{opacity:1; transform:translate(-50%,-50%) scale(1)} }
+
+  /* Big soft drop shadow under the card */
+  .card-shadow{
+    position:absolute; left:5%; right:5%; bottom:-6%; height:40px;
+    background: radial-gradient(ellipse, rgba(60,40,20,.28), transparent 70%);
+    filter: blur(10px); opacity:0;
+    animation: shadowIn 1.2s .6s ease forwards;
+  }
+  @keyframes shadowIn{to{opacity:1}}
+
+  /* INSIDE card — behind the panels, revealed when they open */
+  .inside{
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, #fffbe9 0%, var(--paper) 60%, #efe3c6 100%);
+    border-radius:4px;
+    box-shadow:
+      inset 0 0 60px rgba(176,138,74,.14),
+      0 24px 40px rgba(60,40,20,.12);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:7% 7%;
+    opacity:1;
+  }
+  .inside .border-frame{
+    position:absolute; inset:14px;
+    border:1px solid rgba(176,138,74,.35);
+    border-radius:2px; pointer-events:none;
+  }
+  .inside .border-frame::before{
+    content:""; position:absolute; inset:6px;
+    border:1px solid rgba(176,138,74,.15);
+  }
+
+  /* The two panels (the closed cover) */
+  .panel{
+    position:absolute; top:0; bottom:0; width:50%;
+    background:
+      linear-gradient(var(--grad-dir), #fffbe9 0%, var(--paper) 50%, #e8d9b3 100%);
+    box-shadow:
+      inset 0 0 70px rgba(176,138,74,.22),
+      0 20px 45px rgba(60,40,20,.18);
+    backface-visibility:hidden;
+    transition: transform 3s var(--ease), box-shadow 3s var(--ease);
+    will-change: transform;
+    overflow:hidden;
+  }
+  .panel-left{  left:0;  transform-origin: 0% 50%;   --grad-dir: to right; }
+  .panel-right{ right:0; transform-origin: 100% 50%; --grad-dir: to left;  }
+
+  /* Inner edge line down the fold */
+  .fold-line{
+    position:absolute; top:0; bottom:0; left:50%;
+    width:2px; margin-left:-1px;
+    background: linear-gradient(180deg, transparent, rgba(176,138,74,.35) 20%, rgba(176,138,74,.35) 80%, transparent);
+    pointer-events:none; z-index:4;
+    transition: opacity .6s ease;
+  }
+  #cover.stage-open .fold-line{ opacity:0; }
+
+  /* corners on front of panels */
+  .corner{position:absolute; width:min(55%, 320px); height:auto;}
+  .corner svg{width:100%;height:auto;display:block}
+  .c-tl{top:14px;left:14px}
+  .c-tr{top:14px;right:14px; transform:scaleX(-1)}
+  .c-bl{bottom:14px;left:14px; transform:scaleY(-1)}
+  .c-br{bottom:14px;right:14px; transform:scale(-1,-1)}
+  .corner path.stroke-draw{
+    stroke-dasharray: 1400; stroke-dashoffset:1400;
+    animation: draw 2s .6s var(--ease-soft) forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  /* Cover text, centred over the two panels when closed */
+  .cover-text{
+    position:absolute; left:0; right:0; top:50%;
+    transform:translateY(-50%);
+    text-align:center; z-index:3; pointer-events:none;
+    opacity:0; animation: textIn 1.4s 1.2s var(--ease-soft) forwards;
+    padding:0 10%;
+  }
+  @keyframes textIn{from{opacity:0; transform:translateY(calc(-50% + 12px))} to{opacity:1; transform:translateY(-50%)}}
+  .cover-text .eyebrow{font-size:clamp(9px,1vw,12px); letter-spacing:.42em; color:var(--gold); text-transform:uppercase;}
+  .cover-text .shubh{font-family:'Tiro Devanagari Hindi',serif; font-size:clamp(14px,1.8vw,20px); color:var(--bougain); margin:.7em 0 1em;}
+  .cover-text h1{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    font-size:clamp(38px,7.4vw,88px);
+    line-height:1; margin:0; color:var(--ink);
+    letter-spacing:.01em;
+    display:flex; flex-direction:column; align-items:center; gap:.1em;
+  }
+  .cover-text .amp{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--bougain);
+    font-size:clamp(32px,6vw,72px);
+    line-height:1; display:block; margin:.08em 0;
+  }
+  .cover-text .date{
+    margin-top:1.4em; font-size:clamp(10px,1.1vw,13px); letter-spacing:.4em;
+    color:var(--ink-soft); text-transform:uppercase;
+  }
+  .cover-text .rule{
+    width:60px; height:1px; background:var(--gold); margin:1em auto; opacity:.55;
+  }
+
+  /* Hide cover text IMMEDIATELY as panels start to open (hard cut, no overlap) */
+  #cover.stage-open .cover-text{
+    opacity:0;
+    visibility:hidden;
+    transition: opacity .35s ease, visibility 0s linear .35s;
+  }
+
+  /* Gold monogram ornament under the date on the closed cover */
+  .monogram{
+    position:absolute; left:50%; bottom:5%;
+    transform:translateX(-50%);
+    width:clamp(140px,16vw,200px); height:auto;
+    z-index:3; opacity:0;
+    animation: monoIn 1s 1.6s var(--ease-soft) forwards;
+    pointer-events:none;
+  }
+  @keyframes monoIn{from{opacity:0; transform:translate(-50%, 6px)} to{opacity:1; transform:translate(-50%, 0)}}
+  #cover.stage-open .monogram{ opacity:0; transition: opacity .35s ease; }
+
+  /* Panels OPEN — slow, graceful glide */
+  .panel{ transition: transform 3.6s var(--ease), box-shadow 3.6s var(--ease), opacity .9s ease; }
+  #cover.stage-open .panel-left{
+    transform: translateZ(80px) rotateY(-174deg);
+    box-shadow: inset 0 0 70px rgba(176,138,74,.08), 0 18px 40px rgba(60,40,20,.06);
+  }
+  #cover.stage-open .panel-right{
+    transform: translateZ(80px) rotateY(174deg);
+    box-shadow: inset 0 0 70px rgba(176,138,74,.08), 0 18px 40px rgba(60,40,20,.06);
+    transition-delay:.15s;
+  }
+  /* As panels open, the inside paper fades too — it is not the destination */
+  .inside{ transition: opacity 1.4s 1.6s ease; }
+  #cover.stage-open .inside{ opacity:0; }
+
+  /* Inner-text was duplicating the cover text — removed entirely */
+  .inner-text{ display:none !important; }
+  .inner-text .eyebrow{font-size:clamp(9px,1vw,12px); letter-spacing:.42em; color:var(--gold); text-transform:uppercase;}
+  .inner-text .shubh{font-family:'Tiro Devanagari Hindi',serif; font-size:clamp(14px,1.8vw,20px); color:var(--bougain); margin:.7em 0 .8em;}
+  .inner-text h1{
+    font-family:'Cormorant Garamond',serif; font-weight:500;
+    font-size:clamp(40px,7.6vw,96px); line-height:1; margin:.1em 0; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; gap:.1em;
+  }
+  .inner-text .amp{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--bougain); font-size:clamp(30px,6vw,68px); margin:.08em 0; line-height:1;
+  }
+  .inner-text .quote{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--ink-soft); margin:1.4em auto 0; max-width:30em;
+    font-size:clamp(14px,1.5vw,18px); line-height:1.55;
+  }
+  .inner-text .date{margin-top:1.6em; font-size:clamp(10px,1.1vw,13px); letter-spacing:.4em; color:var(--ink-soft); text-transform:uppercase;}
+  .inner-text .rule{width:60px; height:1px; background:var(--gold); margin:1em auto; opacity:.55;}
+
+  /* Decorative sprigs inside */
+  .inside .sprig{position:absolute; width:min(28%, 220px); opacity:.9;}
+  .inside .sprig.s-tl{top:4%; left:4%;}
+  .inside .sprig.s-tr{top:4%; right:4%; transform:scaleX(-1);}
+  .inside .sprig.s-bl{bottom:4%; left:4%; transform:scaleY(-1);}
+  .inside .sprig.s-br{bottom:4%; right:4%; transform:scale(-1,-1);}
+
+  /* While opening, the cover background fades out so the landing shows through */
+  #cover{ transition: background 1.6s 1.4s ease; }
+  #cover.stage-open{ background: transparent; }
+  #cover.stage-open .paper-grain{ opacity:0; transition: opacity 1.4s 1.4s ease; }
+  #cover.stage-open .card-shadow{ opacity:0; transition: opacity 1.2s 1.4s ease; }
+
+  /* Final exit — card gently lifts and fades out */
+  #cover.exiting .card-stage{
+    transform:translate(-50%,-56%) scale(1.06);
+    transition: transform 1.6s var(--ease-soft), opacity 1.4s ease;
+    opacity:0;
+  }
+  #cover.exiting{ pointer-events:none; }
+
+  /* ========== Falling flowers (intro cover) ========== */
+  .flowers{position:absolute; inset:0; pointer-events:none; overflow:hidden;}
+  .flower{
+    position:absolute; top:-8%;
+    width:var(--size, 28px); height:var(--size, 28px);
+    opacity:0;
+    will-change: transform, opacity;
+    animation:
+      flowerFall var(--dur, 12s) var(--delay,0s) linear infinite,
+      flowerFade 1.4s var(--delay,0s) ease forwards;
+    z-index: var(--z, 7);
+  }
+  .flower svg{width:100%; height:100%; display:block;}
+  @keyframes flowerFade{to{opacity: var(--op, .9)}}
+  @keyframes flowerFall{
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(calc(var(--sway) *  1), 30svh) rotate(calc(var(--spin) * .25)); }
+    50%  { transform: translate(calc(var(--sway) * -1), 55svh) rotate(calc(var(--spin) * .5)); }
+    75%  { transform: translate(calc(var(--sway) *  1), 82svh) rotate(calc(var(--spin) * .75)); }
+    100% { transform: translate(0, 115svh) rotate(var(--spin)); }
+  }
+  @media (max-width:640px){
+    .flower{ transform-origin:center; }
+  }
+
+  /* Skip chip */
+  .skip{
+    position:fixed; top:max(16px, env(safe-area-inset-top)); right:16px;
+    padding:9px 15px; font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    background:rgba(255,255,255,.65); backdrop-filter:blur(8px);
+    border:1px solid rgba(176,138,74,.45); color:var(--ink-soft);
+    border-radius:999px; cursor:pointer; z-index:10000;
+    font-family:'Inter',sans-serif;
+    transition: background .3s, color .3s;
+  }
+  .skip:hover{ background:var(--bougain); color:#fff; border-color:var(--bougain); }
+  .skip:focus-visible{outline:2px solid var(--bougain); outline-offset:2px}
+  body.revealed .skip{display:none}
+
+  /* ========================================================= */
+  /* LANDING                                                    */
+  /* ========================================================= */
+  main.landing{
+    min-height:100svh;
+    background:
+      radial-gradient(ellipse at 50% 0%, #fff9ec 0%, var(--ivory) 50%, #ead9b4 115%);
+    opacity:0; transform:translateY(18px);
+    transition: opacity 1.8s var(--ease-soft), transform 1.8s var(--ease-soft);
+    position:relative;
+    overflow:hidden;
+  }
+  body.landing-in main.landing, body.revealed main.landing{opacity:1; transform:none;}
+
+  .hero{
+    min-height:100svh; height:100svh;
+    display:grid; grid-template-rows: 1fr auto; align-items:start;
+    text-align:center; padding:min(10vh,80px) 6vw 0;
+    position:relative; overflow:hidden;
+  }
+
+  /* MANDAP silhouette, subtle, behind everything */
+  .mandap{
+    position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+    width:min(1200px, 120%); height:auto; pointer-events:none;
+    opacity:0; animation: mandapIn 2.4s .8s var(--ease-soft) forwards;
+  }
+  @keyframes mandapIn{to{opacity:.95}}
+  .mandap .warm-glow{
+    position:absolute;
+  }
+
+  .mandap-wrap{
+    position:relative; align-self:end; width:100%;
+    height:min(40svh, 340px); pointer-events:none; overflow:visible;
+    z-index:2;
+  }
+  .mandap{
+    position:absolute; left:50%; bottom:0;
+    transform:translateX(-50%);
+    width:auto; height:100%;
+    max-width:min(1200px, 100%);
+  }
+  @media (max-width:640px){ .mandap-wrap{ height:min(30svh,240px); } }
+
+  /* Mandap now purely decorative — no fire inside */
+  .mandap{ z-index:1; opacity:.95; }
+  .hero h1:focus, .hero h1:focus-visible{ outline:none; }
+
+  /* ==== Standalone Agnikund — small, subtle, nestled inside the mandap ==== */
+  .agnikund{
+    position:absolute; left:50%; bottom:4%;
+    transform:translateX(-50%);
+    width:clamp(80px, 9vw, 130px); height:auto;
+    z-index:4; pointer-events:none;
+    filter: drop-shadow(0 6px 18px rgba(255,120,50,.25));
+    opacity:.92;
+  }
+  .agni-flame{ transform-origin:110px 200px; animation: agniFlicker 1.6s ease-in-out infinite;}
+  .agni-flame.mid{ animation-duration:1.2s; animation-delay:.3s;}
+  .agni-flame.small{ animation-duration:.9s; animation-delay:.15s;}
+  @keyframes agniFlicker{
+    0%,100% { transform: scale(1,1)    rotate(0deg); }
+    25%     { transform: scale(1.05,.95) rotate(-2deg); }
+    50%     { transform: scale(.95,1.06) rotate(2deg); }
+    75%     { transform: scale(1.03,.98) rotate(-1deg); }
+  }
+  .agni-glow{ animation: agniGlow 4s ease-in-out infinite; transform-origin:110px 150px;}
+  @keyframes agniGlow{
+    0%,100% { opacity:.75; transform: scale(1); }
+    50%     { opacity:1;   transform: scale(1.1); }
+  }
+  .agni-ember{ opacity:0; }
+  .agni-ember.e1{ animation: agniEmber 3.4s ease-in infinite;}
+  .agni-ember.e2{ animation: agniEmber 3.8s .9s ease-in infinite; --tx:-6px;}
+  .agni-ember.e3{ animation: agniEmber 4.2s 1.7s ease-in infinite; --tx:6px;}
+  @keyframes agniEmber{
+    0%  { opacity:0; transform: translate(0,0) scale(.6);}
+    15% { opacity:1; }
+    100%{ opacity:0; transform: translate(var(--tx,0),-60px) scale(.2);}
+  }
+  @keyframes fireIn{to{opacity:.92}}
+  .fire .glow{
+    position:absolute; left:50%; bottom:-20%; transform:translateX(-50%);
+    width:260%; height:260%;
+    background: radial-gradient(ellipse at center, rgba(255,160,70,.45) 0%, rgba(255,120,50,.18) 35%, transparent 70%);
+    filter: blur(8px);
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+  @keyframes glowPulse{0%,100%{opacity:.75; transform:translateX(-50%) scale(1)}50%{opacity:1; transform:translateX(-50%) scale(1.06)}}
+  .flame{
+    position:absolute; left:50%; bottom:12%; transform-origin:center bottom;
+    animation: flicker 1.6s ease-in-out infinite;
+  }
+  .flame.f1{ width:70%; height:85%; transform:translateX(-50%); animation-duration:1.8s; }
+  .flame.f2{ width:48%; height:65%; transform:translateX(-50%); animation-duration:1.2s; animation-delay:.3s; }
+  .flame.f3{ width:28%; height:40%; transform:translateX(-50%); animation-duration:.9s;  animation-delay:.1s; }
+  @keyframes flicker{
+    0%,100%{ transform:translateX(-50%) scale(1,1)    rotate(0deg); }
+    25%    { transform:translateX(-50%) scale(1.03,.97) rotate(-1.5deg); }
+    50%    { transform:translateX(-50%) scale(.97,1.05) rotate(1.5deg); }
+    75%    { transform:translateX(-50%) scale(1.02,.98) rotate(-1deg); }
+  }
+  /* embers */
+  .ember{
+    position:absolute; left:50%; bottom:30%;
+    width:4px; height:4px; border-radius:50%;
+    background:#FFB24A; box-shadow:0 0 8px #FFB24A;
+    opacity:0;
+  }
+  .ember.e1{animation: ember 3.4s 0s ease-in infinite;}
+  .ember.e2{animation: ember 3.8s .9s ease-in infinite; left:46%;}
+  .ember.e3{animation: ember 4.2s 1.7s ease-in infinite; left:54%;}
+  @keyframes ember{
+    0%{opacity:0; transform:translate(-50%,0) scale(.6)}
+    15%{opacity:1}
+    100%{opacity:0; transform:translate(-50%,-220px) scale(.2)}
+  }
+
+  /* Hanging garland crown over hero */
+  .hero-garland{
+    position:absolute; top:0; left:0; right:0;
+    width:100%; height:auto; pointer-events:none;
+    opacity:0; animation: archIn 2s 1.2s ease forwards;
+    transform-origin: top center;
+    animation: archIn 2s 1.2s ease forwards, sway 7s 2s ease-in-out infinite;
+  }
+  @keyframes archIn{to{opacity:1}}
+  @keyframes sway{
+    0%,100%{ transform: rotate(-.5deg); }
+    50%    { transform: rotate(.5deg); }
+  }
+
+  .hero-inner{
+    position:relative; z-index:3; max-width:900px; margin:0 auto; align-self:center;
+    padding-top: clamp(80px, 11vh, 120px);
+    padding-bottom: clamp(16px, 3vh, 40px);
+    background: radial-gradient(ellipse, rgba(251,246,238,.85) 0 50%, transparent 70%);
+  }
+
+  /* Ganesha-elephant corner guardian */
+  .ganesha-corner{
+    position:absolute; left:20px; bottom:20px;
+    width:clamp(90px, 10vw, 140px); height:auto;
+    pointer-events:none; z-index:3; opacity:.9;
+    animation: elephantBob 5s ease-in-out infinite;
+  }
+  @keyframes elephantBob{
+    0%,100%{ transform: translateY(0) rotate(-1deg);}
+    50%    { transform: translateY(-4px) rotate(1deg);}
+  }
+  @media (max-width:640px){ .ganesha-corner{ width:70px; left:12px; bottom:12px; opacity:.75;}}
+  .hero .shubh{font-family:'Tiro Devanagari Hindi',serif; color:var(--bougain); letter-spacing:.1em; font-size:clamp(14px,1.6vw,18px);}
+  .hero .eyebrow{font-size:clamp(10px,1.1vw,12px); letter-spacing:.42em; color:var(--gold); text-transform:uppercase; margin:.9em 0;}
+  .hero h1{
+    font-family:'Cormorant Garamond',serif; font-weight:500;
+    font-size:clamp(32px,5.6vw,74px); line-height:.95; margin:0; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; gap:.02em;
+  }
+  .hero h1 .amp{
+    display:block; font-style:italic; color:var(--bougain);
+    font-size:.55em; line-height:1; margin:.03em 0;
+  }
+  .hero .surname{font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--ink-soft); font-size:clamp(12px,1.5vw,17px); margin-top:.5em; letter-spacing:.1em;}
+  .hero .date{margin-top:1em; font-size:clamp(10px,1.1vw,13px); letter-spacing:.35em; color:var(--ink-soft); text-transform:uppercase;}
+  .scroll-cue{position:absolute; bottom:14px; left:50%; transform:translateX(-50%); color:var(--sage-dark); font-size:10px; letter-spacing:.3em; text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:6px; z-index:4;}
+  .scroll-cue svg{animation: bob 2.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* Persistent intro-flower layer — fixed, high z-index, fades out
+     over 10s after the user has started scrolling / settled on the page,
+     so the dense shower blends gradually into the subtle continuous layer. */
+  .intro-persist{
+    position:fixed; inset:0; pointer-events:none;
+    z-index:6;
+    transition: opacity 10s linear;
+  }
+  body.flowers-settle .intro-persist{ opacity:0; }
+
+  /* Continuous blessing flowers on landing — stay in the DOM so animations don't restart */
+  .bless-wrap{
+    position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:5;
+    opacity:0; visibility:hidden;
+    transition: opacity 1.4s ease, visibility 0s linear 1.4s;
+  }
+  body.revealed .bless-wrap{
+    opacity:1; visibility:visible;
+    transition: opacity 1.4s ease, visibility 0s;
+  }
+  body.landing-in .bless-wrap{
+    opacity:1; visibility:visible;
+    transition: opacity 1.4s ease, visibility 0s;
+  }
+
+  /* ========================================================= */
+  /* SHARED SECTION SHELL                                       */
+  /* ========================================================= */
+  .section{
+    position:relative; padding: clamp(80px, 12vh, 140px) 6vw;
+    text-align:center;
+  }
+  .section + .section{ border-top: 0; }
+
+  /* ===== Consistent wedding-invitation paper palette =====
+     Keep every section on the SAME warm cream base — like real invitation card
+     paper. Colour is carried by accents (borders, icons, text, florals), not
+     by swapping the background. Only the Pullquote and Wish sections lean
+     into blush as deliberate emotional moments. */
+  #letter,
+  #celebration-path,
+  #countdown,
+  #venue,
+  .closing#closing{
+    background:
+      radial-gradient(ellipse at 50% 0%, #FFFBF0 0%, #FBF4E5 55%, #F6ECD3 100%);
+  }
+
+  /* Pullquote keeps its blush — it's an intentional emotional beat */
+  /* Wish section keeps a slightly deeper blush for the sealed-letter moment */
+  .wish-section#wish{
+    background:
+      radial-gradient(ellipse at 50% 0%, #FFF0E6 0%, #FBDFD3 60%, #F3C8BB 100%) !important;
+  }
+
+  /* Legacy helpers kept on the same cream */
+  .section.warm{ background: radial-gradient(ellipse at 50% 0%, #FFFBF0 0%, #FBF4E5 55%, #F6ECD3 100%); }
+  .section.blush{ background: linear-gradient(180deg, #FDF0E6 0%, #FBE7E0 100%); }
+  .section.sage{ background: linear-gradient(180deg, #F0F2E4 0%, #E8EFDC 100%); }
+
+  /* Decorative paisley/floral divider between sections */
+  .ornament-divider{
+    display:flex; align-items:center; justify-content:center;
+    padding: 36px 20px 10px; margin: 0 auto; max-width:420px;
+    opacity:.85;
+  }
+  .ornament-divider svg{width:100%; height:auto; max-width:360px;}
+
+  /* Big pull-quote banner */
+  .pullquote{
+    position:relative; padding: clamp(90px,14vh,150px) 6vw;
+    text-align:center; overflow:hidden;
+    background: linear-gradient(180deg, #FDF2E7 0%, #FCE6DA 100%);
+  }
+  .pullquote::before, .pullquote::after{
+    content:""; position:absolute; left:50%; transform:translateX(-50%);
+    width:min(900px,92%); height:1px;
+    background: linear-gradient(90deg, transparent, rgba(176,138,74,.5), transparent);
+  }
+  .pullquote::before{top:30px;}
+  .pullquote::after{bottom:30px;}
+  .pullquote .mark{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--bougain); font-size:clamp(60px,8vw,120px); line-height:1;
+    margin-bottom:.1em; display:block;
+  }
+  .pullquote blockquote{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--ink); font-size:clamp(22px,3.2vw,42px); line-height:1.4;
+    margin:0 auto; max-width:22ch;
+  }
+  .pullquote cite{
+    display:block; margin-top:1.6em;
+    font-family:'Dancing Script',cursive; font-style:normal;
+    color:var(--bougain); font-size:clamp(22px,2.4vw,30px);
+  }
+  .pullquote .corner{position:absolute; width:min(26%,220px); opacity:.6;}
+  .pullquote .corner.left{top:50%; left:3%; transform:translateY(-50%);}
+  .pullquote .corner.right{top:50%; right:3%; transform:translateY(-50%) scaleX(-1);}
+  @media (max-width:720px){ .pullquote .corner{display:none;} }
+
+  /* ========================================================= */
+  /* ROSE PETAL BLOOM (around pullquote)                        */
+  /* ========================================================= */
+  .pullquote .petal-bloom{position:absolute; inset:0; pointer-events:none; z-index:1;}
+  .pullquote .bloom-petal{
+    position:absolute;
+    width:clamp(16px,2vw,28px); height:clamp(16px,2vw,28px);
+    opacity:0;
+    animation: bloomFloat var(--d,8s) var(--delay,0s) ease-in-out infinite,
+               bloomFade 2s var(--delay,0s) ease forwards;
+  }
+  .pullquote .bloom-petal svg{width:100%;height:100%;display:block;}
+  @keyframes bloomFade{to{opacity:.75}}
+  @keyframes bloomFloat{
+    0%,100%{ transform: translate(0,0) rotate(0); }
+    25%    { transform: translate(14px,-18px) rotate(90deg); }
+    50%    { transform: translate(-8px,-30px) rotate(180deg); }
+    75%    { transform: translate(-16px,-14px) rotate(270deg); }
+  }
+  .pullquote blockquote{ position:relative; z-index:2;}
+  .pullquote cite{ position:relative; z-index:2;}
+
+  /* ========================================================= */
+  /* CELEBRATION PATH — richer, Rajasthani-flavoured            */
+  /* ========================================================= */
+  .path-wrap{
+    position:relative; max-width:1100px; margin: 3.4em auto 0;
+    padding: 0 10px;
+  }
+  .path-day{
+    display:grid; grid-template-columns: auto 1fr; gap: clamp(22px,3vw,44px);
+    align-items:start; margin-bottom: clamp(60px,8vw,110px);
+    position:relative;
+  }
+  .path-day::before{
+    content:""; position:absolute; left:49px; top:110px; bottom:-50px;
+    width:2px; margin-left:-1px;
+    background: repeating-linear-gradient(180deg,
+      #E85A7A 0 6px, transparent 6px 14px,
+      #E8A33D 14px 20px, transparent 20px 28px);
+    opacity:.6;
+  }
+  .path-day:last-child::before{ display:none; }
+
+  /* mandala day medallion */
+  .day-badge{
+    width:100px; height:100px; border-radius:50%;
+    position:relative; z-index:3;
+    background: radial-gradient(circle, #fff8e3 0%, #f6ead1 70%, #e9d5a1 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow: 0 10px 22px rgba(60,40,20,.14), inset 0 2px 4px rgba(255,255,255,.6);
+    text-align:center; color:var(--ink);
+  }
+  .day-badge::before{
+    content:""; position:absolute; inset:-4px;
+    border-radius:50%;
+    background: conic-gradient(from 0deg,
+      #B08A4A 0deg 10deg, transparent 10deg 20deg,
+      #B08A4A 20deg 30deg, transparent 30deg 40deg,
+      #B08A4A 40deg 50deg, transparent 50deg 60deg,
+      #B08A4A 60deg 70deg, transparent 70deg 80deg,
+      #B08A4A 80deg 90deg, transparent 90deg 100deg,
+      #B08A4A 100deg 110deg, transparent 110deg 120deg,
+      #B08A4A 120deg 130deg, transparent 130deg 140deg,
+      #B08A4A 140deg 150deg, transparent 150deg 160deg,
+      #B08A4A 160deg 170deg, transparent 170deg 180deg,
+      #B08A4A 180deg 190deg, transparent 190deg 200deg,
+      #B08A4A 200deg 210deg, transparent 210deg 220deg,
+      #B08A4A 220deg 230deg, transparent 230deg 240deg,
+      #B08A4A 240deg 250deg, transparent 250deg 260deg,
+      #B08A4A 260deg 270deg, transparent 270deg 280deg,
+      #B08A4A 280deg 290deg, transparent 290deg 300deg,
+      #B08A4A 300deg 310deg, transparent 310deg 320deg,
+      #B08A4A 320deg 330deg, transparent 330deg 340deg,
+      #B08A4A 340deg 350deg, transparent 350deg 360deg);
+    -webkit-mask: radial-gradient(circle, transparent 42px, #000 44px, #000 50px, transparent 51px);
+            mask: radial-gradient(circle, transparent 42px, #000 44px, #000 50px, transparent 51px);
+    opacity:.55; animation: spin 60s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .day-badge::after{
+    content:""; position:absolute; inset:6px; border-radius:50%;
+    border:1px dashed rgba(176,138,74,.45);
+    pointer-events:none;
+  }
+  .day-badge .d-num{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:34px; line-height:1; color:var(--bougain);}
+  .day-badge .d-mo{font-size:9px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase; margin-top:4px;}
+
+  .day-body{text-align:left; padding-top:6px;}
+  .day-head{
+    display:flex; align-items:baseline; flex-wrap:wrap; gap:14px;
+    margin-bottom:1.4em;
+    font-family:'Cormorant Garamond',serif;
+  }
+  .day-head .d-tag{
+    font-family:'Dancing Script',cursive; color:var(--bougain);
+    font-size:clamp(20px,2.4vw,26px); font-style:normal;
+    margin-right:4px;
+  }
+  .day-head .d-title{font-weight:500; font-size:clamp(28px,3.6vw,42px); color:var(--ink); margin:0;}
+  .day-head .d-meta{font-style:italic; color:var(--ink-soft); font-size:clamp(15px,1.6vw,18px); display:block; width:100%; margin-top:.2em;}
+
+  .path-stops{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+    gap: clamp(16px,2.2vw,24px);
+  }
+  .stop{
+    position:relative;
+    background: linear-gradient(180deg, #FFFBF0 0%, #FBF4E5 100%);
+    border:1px solid rgba(176,138,74,.3);
+    border-left: 6px solid #B08A4A;
+    border-radius:8px;
+    padding: 22px 20px 20px 22px;
+    box-shadow: 0 14px 30px rgba(60,40,20,.08);
+    transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft);
+    overflow:hidden;
+  }
+  /* Slow rotating gold conic ring around every stop card */
+  .stop::after{
+    content:""; position:absolute; inset:-2px; border-radius:10px; padding:1px;
+    background: conic-gradient(from 0deg,
+      transparent 0deg, #D4A52C 90deg, transparent 180deg, #FFE09A 270deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:.35; animation: slowSpin 16s linear infinite; pointer-events:none;
+  }
+  .stop::before{
+    content:""; position:absolute; inset:8px;
+    border:1px solid rgba(176,138,74,.22);
+    border-radius:4px; pointer-events:none;
+  }
+  .stop:hover{ transform:translateY(-4px); box-shadow:0 20px 40px rgba(60,40,20,.14);}
+  /* top-corner mehndi flourish */
+  .stop .mehndi{
+    position:absolute; top:2px; right:2px; width:70px; height:70px; pointer-events:none; opacity:.5;
+  }
+  .stop .stop-icon{
+    width:52px; height:52px; border-radius:50%; margin:0 auto 10px;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, #fff2d8, #f0c56a);
+    color:#B06A20; border:1px solid rgba(176,138,74,.4);
+    box-shadow: 0 4px 10px rgba(60,40,20,.1), inset 0 2px 4px rgba(255,255,255,.6);
+    position:relative; z-index:1;
+  }
+  .stop .ribbon{
+    font-family:'Dancing Script',cursive; color:var(--bougain);
+    font-size:15px; text-align:center; margin-bottom:.3em;
+    position:relative; z-index:1;
+  }
+  .stop .t{font-size:10px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase; margin-bottom:4px; text-align:center;}
+  .stop h4{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:21px; margin:.1em 0 .5em; color:var(--ink); text-align:center;}
+  .stop p{color:var(--ink-soft); font-size:14.5px; line-height:1.6; margin:0 0 .9em; font-style:italic; font-family:'Cormorant Garamond',serif; text-align:center;}
+  .stop .ven{
+    font-family:'Inter'; font-size:11.5px; color:var(--sage-dark);
+    letter-spacing:.03em; display:flex; align-items:flex-start; gap:6px;
+    padding-top:.8em; margin-top:auto; border-top:1px dashed rgba(176,138,74,.3);
+    text-align:left;
+  }
+  .stop .ven svg{flex-shrink:0; margin-top:2px;}
+
+  /* ===== Per-event theme — cream card with a bold left colour-bar =====
+     Keeps the invitation-paper feel intact; theme colour is carried by
+     the bar + icon + ribbon + accents, not by flooding the whole card. */
+  .stop.vinayak{ border-left-color:#E48C2A; }
+  .stop.vinayak .stop-icon{ background: radial-gradient(circle, #FFF4D5, #F0B855); color:#C4521C; border-color:rgba(196,82,28,.3);}
+  .stop.vinayak .ribbon{ color:#C4521C; }
+  .stop.vinayak::before{ border-color: rgba(228,148,29,.35);}
+
+  .stop.haldi{ border-left-color:#D4A52C; }
+  .stop.haldi .stop-icon{ background: radial-gradient(circle, #FFF8D5, #E8C040); color:#8E6A1E; border-color:rgba(142,106,30,.3);}
+  .stop.haldi .ribbon{ color:#8E6A1E; }
+  .stop.haldi::before{ border-color: rgba(212,165,44,.35);}
+
+  .stop.sangeet{ border-left-color:#D86590; }
+  .stop.sangeet .stop-icon{ background: radial-gradient(circle, #FFECF2, #E8A0BC); color:#B4213B; border-color:rgba(180,33,59,.3);}
+  .stop.sangeet .ribbon{ color:#B4213B; }
+  .stop.sangeet::before{ border-color: rgba(216,101,144,.35);}
+
+  .stop.hilite{
+    border-left: 6px solid #B4213B;
+    background: linear-gradient(180deg, #FFF4E0 0%, #FFE8D5 100%);
+    box-shadow: 0 18px 36px rgba(138,26,47,.18);
+  }
+  .stop.hilite .stop-icon{
+    background: radial-gradient(circle, #FFE4D4, #B4213B);
+    color:#F3E3BF; border-color: rgba(243,227,191,.4);
+  }
+  .stop.hilite .ribbon{ color:#8A1A2F; }
+  .stop.hilite h4{ color:#5A0A19; }
+  .stop.hilite::before{ border-color: rgba(138,26,47,.3);}
+
+  @media (max-width:640px){
+    .path-day{ grid-template-columns: 72px 1fr; gap:14px;}
+    .path-day::before{ left:36px; top:84px;}
+    .day-badge{ width:72px; height:72px;}
+    .day-badge .d-num{font-size:26px;}
+    .day-badge::before{ -webkit-mask: radial-gradient(circle, transparent 30px, #000 32px, #000 36px, transparent 37px);
+                                mask: radial-gradient(circle, transparent 30px, #000 32px, #000 36px, transparent 37px);}
+  }
+
+  /* ========================================================= */
+  /* RAJASTHANI DECORATIVE CRAFT (mandala watermarks, jaali)    */
+  /* ========================================================= */
+  .mandala-watermark{
+    position:absolute; width:min(260px, 32vw); height:auto;
+    opacity:.09; pointer-events:none; z-index:0;
+  }
+  .mandala-watermark.tl{ top:40px; left:20px; }
+  .mandala-watermark.br{ bottom:40px; right:20px; transform: rotate(45deg);}
+
+  /* Floating diya ornament */
+  .diya-float{
+    position:absolute; width:40px; height:60px; pointer-events:none; z-index:0;
+    animation: diyaSwing 4s ease-in-out infinite;
+    transform-origin: top center;
+  }
+  @keyframes diyaSwing{
+    0%,100%{transform: rotate(-3deg);}
+    50%    {transform: rotate(3deg);}
+  }
+  .diya-float svg{width:100%;height:100%;}
+
+  /* Jaali lattice side pattern */
+  .jaali-side{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:48px; height:min(400px,60vh); pointer-events:none;
+    opacity:.3; z-index:0;
+  }
+  .jaali-side.left{ left:8px; }
+  .jaali-side.right{ right:8px; }
+  @media (max-width:900px){ .jaali-side{display:none;} }
+
+  /* Phulkari-stitch border for sections */
+  .phulkari-top, .phulkari-bot{
+    position:absolute; left:0; right:0; height:14px; pointer-events:none;
+    background-size: 32px 14px; background-repeat: repeat-x;
+    opacity:.55;
+    background-image: linear-gradient(45deg, transparent 48%, #E85A7A 48% 52%, transparent 52%),
+                      linear-gradient(-45deg, transparent 48%, #E8A33D 48% 52%, transparent 52%);
+  }
+  .phulkari-top{ top:0; }
+  .phulkari-bot{ bottom:0; transform: scaleY(-1); }
+
+  /* Toran (door hanging) at top of a section */
+  .toran{
+    position:absolute; top:0; left:50%;
+    width:min(640px, 86%); height:70px; pointer-events:none;
+    transform: translateX(-50%);
+    animation: toranSway 7s ease-in-out infinite;
+    transform-origin: top center;
+    z-index:1;
+  }
+  .toran svg{width:100%; height:100%; display:block;}
+  @keyframes toranSway{
+    0%,100%{ transform: translateX(-50%) rotate(-.5deg); }
+    50%    { transform: translateX(-50%) rotate(.5deg); }
+  }
+
+  /* Section theme badge */
+  .theme-badge{
+    width:68px; height:68px; margin: 0 auto 14px;
+    background: radial-gradient(circle, #fff8e3, #f6ead1 70%, #e9d5a1);
+    border-radius:50%;
+    border:1px solid rgba(176,138,74,.45);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 14px rgba(60,40,20,.1), inset 0 2px 4px rgba(255,255,255,.6);
+    position:relative; z-index:2;
+  }
+  .theme-badge::before{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    border:1px dashed rgba(176,138,74,.4);
+    animation: slowSpin 60s linear infinite;
+  }
+  @keyframes slowSpin{to{transform:rotate(360deg);}}
+  .theme-badge svg{width:40px; height:40px;}
+
+  /* Floating peacock feathers in section corners */
+  .peacock-left, .peacock-right{
+    position:absolute; width:min(100px, 10vw); height:auto;
+    pointer-events:none; opacity:.65; z-index:0;
+    animation: feather-sway 6s ease-in-out infinite;
+    transform-origin: top center;
+  }
+  .peacock-left{ top:30px; left:30px; }
+  .peacock-right{ top:30px; right:30px; transform: scaleX(-1); animation-delay:-3s;}
+  @keyframes feather-sway{
+    0%,100%{ transform: rotate(-4deg); }
+    50%    { transform: rotate(4deg); }
+  }
+  .peacock-right{ animation-name: feather-sway-r; }
+  @keyframes feather-sway-r{
+    0%,100%{ transform: scaleX(-1) rotate(-4deg); }
+    50%    { transform: scaleX(-1) rotate(4deg); }
+  }
+  @media (max-width:720px){ .peacock-left, .peacock-right{display:none;}}
+
+  /* Kalash — sacred pot ornament */
+  .kalash-left, .kalash-right{
+    position:absolute; bottom:40px; width:60px; height:auto;
+    pointer-events:none; opacity:.8; z-index:0;
+  }
+  .kalash-left{ left:30px; }
+  .kalash-right{ right:30px; }
+  @media (max-width:720px){ .kalash-left, .kalash-right{display:none;}}
+
+  /* ============== FLASHY WEDDING SPARKLE LAYER ============== */
+  /* Gold shimmer wave across text (names, titles) */
+  .shimmer{
+    background: linear-gradient(90deg,
+      currentColor 0%,
+      currentColor 30%,
+      #D4A52C 45%,
+      #FFE09A 50%,
+      #D4A52C 55%,
+      currentColor 70%,
+      currentColor 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shimmerSweep 5s linear infinite;
+  }
+  @keyframes shimmerSweep{
+    0%  { background-position: 150% 0; }
+    100%{ background-position: -150% 0; }
+  }
+
+  /* Big bright gold sparkles — behind content, never covering it */
+  .sparkle-field{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+  .sparkle{
+    position:absolute;
+    width:22px; height:22px;
+    animation: sparkleTwinkle var(--d,2.4s) var(--delay,0s) ease-in-out infinite;
+    opacity:0;
+    filter: drop-shadow(0 0 8px rgba(255,224,154,.95));
+  }
+  .sparkle::before, .sparkle::after{
+    content:""; position:absolute; left:50%; top:50%;
+    background: radial-gradient(ellipse at center, #FFF4C2 0%, #FFD98A 35%, #D4A52C 65%, transparent 80%);
+    border-radius: 2px;
+  }
+  .sparkle::before{
+    width: 100%; height: 3px; transform: translate(-50%,-50%);
+  }
+  .sparkle::after{
+    width: 3px; height: 100%; transform: translate(-50%,-50%);
+  }
+  @keyframes sparkleTwinkle{
+    0%,100%{ opacity:0; transform: scale(0.2) rotate(0deg); }
+    35%    { opacity:1; transform: scale(1.4) rotate(45deg); }
+    65%    { opacity:1; transform: scale(1.6) rotate(90deg); }
+    80%    { opacity:.4; transform: scale(.8) rotate(120deg); }
+  }
+
+  /* Soft golden glow pulse on key elements */
+  .glow-pulse{
+    animation: glowPulse 3.5s ease-in-out infinite;
+  }
+  @keyframes glowPulse{
+    0%,100%{ filter: drop-shadow(0 0 0 rgba(212,165,44,0)); }
+    50%    { filter: drop-shadow(0 0 14px rgba(212,165,44,.55)); }
+  }
+
+  /* Animated gold border for cards */
+  .gold-trim{
+    position:relative;
+  }
+  .gold-trim::after{
+    content:""; position:absolute; inset:-1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(90deg, transparent, #D4A52C, #FFE09A, #D4A52C, transparent);
+    background-size: 200% 100%;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: goldSweep 4s linear infinite;
+    pointer-events:none; opacity:.75;
+  }
+  @keyframes goldSweep{
+    0%  { background-position: 200% 0; }
+    100%{ background-position: -200% 0; }
+  }
+
+  /* Enhanced countdown number glow — much more visible */
+  .cd-num{
+    animation: numberGlow 2.6s ease-in-out infinite;
+    background: linear-gradient(180deg, #2B2320 0%, #8A1A2F 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  @keyframes numberGlow{
+    0%,100%{ text-shadow: 0 0 14px rgba(212,165,44,.3); filter: drop-shadow(0 0 2px rgba(255,224,154,.3)); }
+    50%    { text-shadow: 0 0 32px rgba(212,165,44,.8), 0 0 48px rgba(232,90,122,.3); filter: drop-shadow(0 0 8px rgba(255,224,154,.7)); }
+  }
+
+  /* Pulsing coloured aura behind each event card icon */
+  .event-vinayak .ev-icon, .event-haldi .ev-icon,
+  .event-sangeet .ev-icon, .event-wedding .ev-icon,
+  .stop .stop-icon{
+    animation: iconPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes iconPulse{
+    0%,100%{ box-shadow: 0 6px 14px rgba(60,40,20,.08), inset 0 2px 4px rgba(255,255,255,.6), 0 0 0 rgba(212,165,44,0); }
+    50%    { box-shadow: 0 6px 14px rgba(60,40,20,.1),  inset 0 2px 4px rgba(255,255,255,.6), 0 0 24px rgba(212,165,44,.55); }
+  }
+
+  /* Big dramatic shining ring around the Wedding Ceremony stop */
+  .stop.hilite{
+    animation: weddingGlow 3s ease-in-out infinite;
+  }
+  @keyframes weddingGlow{
+    0%,100%{ box-shadow: 0 18px 36px rgba(138,26,47,.18), 0 0 0 rgba(180,33,59,0); }
+    50%    { box-shadow: 0 18px 36px rgba(138,26,47,.22), 0 0 32px rgba(180,33,59,.4); }
+  }
+
+  /* Date title in countdown — big gradient shimmer */
+  #countdown .section-title{
+    animation: titleSheen 3.5s linear infinite;
+  }
+
+  /* Pulsing gradient border on the venue card */
+  .venue-card{
+    animation: venueBreath 4s ease-in-out infinite;
+  }
+  @keyframes venueBreath{
+    0%,100%{ box-shadow: 0 20px 40px rgba(60,40,20,.1), 0 0 0 rgba(212,165,44,0); }
+    50%    { box-shadow: 0 20px 40px rgba(60,40,20,.1), 0 0 40px rgba(212,165,44,.3); }
+  }
+
+  /* Envelope seal breathing glow (stronger) */
+  .env-seal{
+    animation: sealBreath 2.4s ease-in-out infinite;
+  }
+  @keyframes sealBreath{
+    0%,100%{ filter: drop-shadow(0 0 6px rgba(180,33,59,.4)) drop-shadow(0 0 2px rgba(212,165,44,.3)); }
+    50%    { filter: drop-shadow(0 0 20px rgba(180,33,59,.8)) drop-shadow(0 0 10px rgba(212,165,44,.6)); }
+  }
+
+  /* Pulse the whole wish envelope button to invite the tap */
+  .wish-envelope:not(.open){ animation: inviteTap 3.6s ease-in-out infinite; }
+  @keyframes inviteTap{
+    0%,100%{ transform: translateY(0); }
+    50%    { transform: translateY(-8px); }
+  }
+
+  /* Diya enhanced flicker glow */
+  .diya-float{ filter: drop-shadow(0 0 8px rgba(255,178,74,.5)); }
+
+  /* Section twinkle lights across the top */
+  .twinkle-strip{
+    position:absolute; top:12px; left:4%; right:4%; height:30px;
+    pointer-events:none; z-index:0;
+  }
+  .twinkle-strip svg{ width:100%; height:100%;}
+  .twinkle-strip .twinkle{animation: twinkle 2.2s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
+
+  /* ========================================================= */
+  /* INTERACTIVE SEALED LETTER TO GUESTS                        */
+  /* ========================================================= */
+  .wish-section{
+    position:relative; padding: clamp(80px,12vh,140px) 6vw;
+    text-align:center;
+    background: linear-gradient(180deg, #FBF6EE 0%, #FDEDE2 100%);
+    overflow:hidden;
+  }
+  .wish-section::before, .wish-section::after{
+    content:""; position:absolute; left:50%; transform:translateX(-50%);
+    width:min(900px,92%); height:1px;
+    background: linear-gradient(90deg, transparent, rgba(176,138,74,.55), transparent);
+  }
+  .wish-section::before{top:28px;} .wish-section::after{bottom:28px;}
+
+  .wish-wrap{
+    position:relative; perspective:1600px; max-width:520px; margin: 2.4em auto 0;
+    height: 320px;
+  }
+  .wish-envelope{
+    position:relative; width:100%; max-width:460px; height: 300px;
+    margin:0 auto;
+    cursor:pointer; display:block;
+    background:transparent; border:0; padding:0;
+    font: inherit; color:inherit;
+    transform-style:preserve-3d;
+    transition: transform 1.2s var(--ease-soft);
+  }
+  .wish-envelope:focus-visible{ outline:3px solid var(--bougain); outline-offset:6px; border-radius:4px;}
+  .wish-envelope .env-body{
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, #FBF2DE 0%, #F3E3BF 100%);
+    border:1px solid rgba(176,138,74,.5);
+    border-radius:4px;
+    box-shadow: 0 24px 50px rgba(60,40,20,.2), inset 0 0 50px rgba(176,138,74,.1);
+  }
+  .wish-envelope .env-flap{
+    position:absolute; top:0; left:0; right:0; height:60%;
+    background: linear-gradient(180deg, #F3E3BF 0%, #E6D29C 100%);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transition: transform 1.4s var(--ease-soft);
+    box-shadow: 0 2px 8px rgba(60,40,20,.1);
+    z-index:4;
+  }
+  .wish-envelope .env-flap::before{
+    content:""; position:absolute; inset:4px;
+    clip-path: polygon(0 0, 100% 0, 50% 94%);
+    border:1px solid rgba(176,138,74,.25);
+  }
+  .wish-envelope .env-seal{
+    position:absolute; left:50%; top:48%; transform:translate(-50%,-50%);
+    width:68px; height:68px; z-index:5;
+    transition: opacity .4s ease;
+  }
+  .wish-envelope .env-seal svg{width:100%; height:100%;}
+  .wish-envelope .env-hint{
+    position:absolute; left:50%; bottom:-32px; transform:translateX(-50%);
+    font-family:'Dancing Script',cursive; color:var(--bougain); font-size:18px;
+    white-space:nowrap;
+    animation: hintPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes hintPulse{0%,100%{opacity:.7} 50%{opacity:1}}
+  .wish-envelope .env-letter{
+    position:absolute; left:4%; right:4%; top:12%; bottom:8%;
+    background: linear-gradient(180deg, #fffbe9, var(--paper));
+    border:1px solid rgba(176,138,74,.35);
+    border-radius:3px;
+    box-shadow: 0 10px 24px rgba(60,40,20,.1);
+    padding: 24px 22px;
+    opacity:0;
+    transform: translateY(0);
+    transition: opacity .6s .6s ease, transform 1s .6s var(--ease-soft);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+  }
+  .wish-envelope .env-letter-inner{
+    font-family:'Cormorant Garamond',serif; color:var(--ink);
+    font-style:italic; font-size:15.5px; line-height:1.7;
+  }
+  .wish-envelope .env-letter-inner .lead{
+    font-family:'Dancing Script',cursive; color:var(--bougain); font-size:22px;
+    font-style:normal; display:block; margin-bottom:.4em;
+  }
+
+  /* Opened state */
+  .wish-envelope.open .env-flap{ transform: rotateX(-178deg);}
+  .wish-envelope.open .env-seal{ opacity:0;}
+  .wish-envelope.open .env-letter{
+    opacity:1; transform: translateY(-54%);
+    top:50%; left:-6%; right:-6%; height:auto; bottom:auto;
+    padding: 32px 28px;
+  }
+  .wish-envelope.open{ transform: translateY(-18px);}
+  .wish-note{margin-top:3.6em; font-size:12px; color:var(--ink-soft); letter-spacing:.1em;}
+  .story{
+    max-width: 1000px; margin: 3em auto 0;
+    position:relative;
+  }
+  .story::before{
+    content:""; position:absolute; left:50%; top:0; bottom:0;
+    width:2px; margin-left:-1px;
+    background: repeating-linear-gradient(180deg,
+      rgba(232,90,122,.5) 0 10px, transparent 10px 18px);
+  }
+  .story-item{
+    display:grid; grid-template-columns: 1fr auto 1fr;
+    gap: clamp(20px, 3vw, 40px); align-items:center;
+    margin: clamp(40px,6vw,80px) 0;
+    position:relative;
+  }
+  .story-item .card{
+    background: linear-gradient(180deg, #fffbe9, var(--paper));
+    border:1px solid rgba(176,138,74,.3);
+    border-radius:6px;
+    padding: clamp(22px,2.6vw,32px);
+    box-shadow: 0 14px 30px rgba(60,40,20,.08);
+    text-align:left;
+  }
+  .story-item .card .date{font-family:'Dancing Script',cursive; color:var(--bougain); font-size:clamp(20px,2.4vw,26px); margin-bottom:.3em;}
+  .story-item .card h3{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(22px,2.6vw,30px); margin:.1em 0 .5em; color:var(--ink);}
+  .story-item .card p{color:var(--ink-soft); font-size:14.5px; line-height:1.7; margin:0;}
+  .story-item .emblem{
+    width:72px; height:72px; border-radius:50%;
+    background: radial-gradient(circle, #fff8e3 0%, #f6ead1 70%, #e9d5a1 100%);
+    border:1px solid rgba(176,138,74,.4);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 16px rgba(60,40,20,.1);
+    z-index:2; color:var(--bougain);
+    flex-shrink:0;
+  }
+  .story-item .illust{display:flex; justify-content:center;}
+  .story-item .illust svg{width:min(100%, 220px); height:auto;}
+
+  .story-item:nth-child(odd)  .card  { grid-column:1; }
+  .story-item:nth-child(odd)  .illust{ grid-column:3; }
+  .story-item:nth-child(even) .illust{ grid-column:1; }
+  .story-item:nth-child(even) .card  { grid-column:3; text-align:right; }
+  .story-item .emblem{ grid-column:2; }
+
+  @media (max-width:720px){
+    .story::before{ left:34px; }
+    .story-item{ grid-template-columns: 68px 1fr; gap:16px;}
+    .story-item .emblem{ width:56px; height:56px; grid-column:1 !important;}
+    .story-item .card, .story-item .illust{ grid-column:2 !important; text-align:left !important;}
+    .story-item .illust{ margin-top:12px;}
+  }
+  .section-eyebrow{font-size:clamp(10px,1.1vw,12px); letter-spacing:.42em; color:var(--gold); text-transform:uppercase;}
+  .section-title{
+    font-family:'Cormorant Garamond',serif; font-weight:500; color:var(--ink);
+    font-size:clamp(32px,5vw,56px); margin:.3em 0 .2em;
+    position:relative; z-index:2;
+    background:
+      linear-gradient(100deg,
+        currentColor 0%, currentColor 22%,
+        #B08A4A 36%,
+        #D4A52C 44%,
+        #FFE09A 50%,
+        #FFF4C2 52%,
+        #FFE09A 54%,
+        #D4A52C 60%,
+        #B08A4A 68%,
+        currentColor 82%, currentColor 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: titleSheen 5s linear infinite;
+  }
+  @keyframes titleSheen{
+    0%  { background-position: 120% 0; }
+    100%{ background-position: -120% 0; }
+  }
+  .section-ornament{display:flex; align-items:center; justify-content:center; gap:14px; margin:0 auto 1em; opacity:.7;}
+  .section-ornament .line{height:1px; width:50px; background:var(--gold);}
+  .section-ornament svg{width:16px; height:16px;}
+  .section-sub{color:var(--ink-soft); max-width:46ch; margin:0 auto; line-height:1.65; font-size:clamp(14px,1.3vw,16px);}
+
+  /* fade-in on scroll */
+  .reveal{opacity:0; transform:translateY(24px); transition: opacity 1s var(--ease-soft), transform 1s var(--ease-soft);}
+  .reveal.in{opacity:1; transform:none;}
+
+  /* ========================================================= */
+  /* LETTER                                                     */
+  /* ========================================================= */
+  .letter-wrap{ max-width: 720px; margin: 2em auto 0; position:relative; }
+  .letter{
+    position:relative;
+    background: linear-gradient(180deg, #fffbe9 0%, var(--paper) 60%, #efe3c6 100%);
+    padding: clamp(32px, 5vw, 56px) clamp(28px, 5vw, 56px);
+    border-radius:4px;
+    box-shadow: inset 0 0 60px rgba(176,138,74,.14), 0 24px 50px rgba(60,40,20,.14);
+    text-align:center;
+  }
+  .letter::before{
+    content:""; position:absolute; inset:14px; border:1px solid rgba(176,138,74,.35); pointer-events:none;
+  }
+  .letter .salutation{font-family:'Dancing Script',cursive; color:var(--bougain); font-size:clamp(28px,3.5vw,42px); margin:0 0 .5em;}
+  .letter .body{font-family:'Cormorant Garamond',serif; color:var(--ink); font-size:clamp(16px,1.5vw,19px); line-height:1.75; margin:1em 0;}
+  .letter .signature{font-family:'Dancing Script',cursive; color:var(--ink); font-size:clamp(22px,2.5vw,30px); margin-top:1.4em;}
+  .letter .family{font-family:'Inter'; letter-spacing:.3em; font-size:11px; color:var(--ink-soft); text-transform:uppercase; margin-top:.4em;}
+  .letter-corner{position:absolute; width:min(26%,160px); opacity:.95;}
+  .letter-corner.lc-tl{top:-18px; left:-18px;}
+  .letter-corner.lc-br{bottom:-18px; right:-18px; transform:scale(-1,-1);}
+
+  /* ========================================================= */
+  /* COUNTDOWN                                                  */
+  /* ========================================================= */
+  .countdown{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 2vw, 22px);
+    max-width: 720px; margin: 2.4em auto 1.4em;
+  }
+  .cd-tile{
+    background: linear-gradient(180deg, #fffbe9, var(--paper));
+    border:1px solid rgba(212,165,44,.5);
+    border-radius:6px;
+    padding: clamp(18px,2.4vw,26px) 6px;
+    box-shadow: 0 10px 24px rgba(60,40,20,.08), 0 0 0 1px rgba(212,165,44,.15) inset;
+    position:relative;
+    transition: transform .4s var(--ease-soft), box-shadow .4s var(--ease-soft);
+  }
+  .cd-tile:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(60,40,20,.14), 0 0 24px rgba(212,165,44,.3);
+  }
+  /* subtle rotating gold ring around each countdown tile */
+  .cd-tile::before{
+    content:""; position:absolute; inset:-2px; border-radius:7px;
+    padding:1px;
+    background: conic-gradient(from 0deg,
+      transparent 0deg, #D4A52C 90deg, transparent 180deg, #FFE09A 270deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:.45; animation: slowSpin 12s linear infinite; pointer-events:none;
+  }
+  .cd-num{
+    font-family:'Cormorant Garamond',serif; font-weight:500;
+    font-size:clamp(32px,5vw,56px); line-height:1; color:var(--ink);
+    display:block;
+  }
+  .cd-lbl{font-size:clamp(9px,1vw,11px); letter-spacing:.3em; color:var(--gold); text-transform:uppercase; margin-top:.6em; display:block;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--bougain); color:#fff;
+    font-family:'Inter'; font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    padding:12px 22px; border-radius:999px; border:0; cursor:pointer; text-decoration:none;
+    transition: transform .3s, box-shadow .3s, background .3s;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(232,90,122,.3); background:#d14a69; }
+  .btn.ghost{ background:transparent; color:var(--bougain); border:1px solid var(--bougain);}
+  .btn.ghost:hover{ background:var(--bougain); color:#fff;}
+
+  /* ========================================================= */
+  /* ITINERARY                                                  */
+  /* ========================================================= */
+  .itinerary{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: clamp(20px, 3vw, 32px);
+    max-width: 1100px; margin: 2.4em auto 0;
+    text-align:left;
+  }
+  .event{
+    position:relative;
+    background: linear-gradient(180deg, #fffbe9, var(--paper));
+    border:1px solid rgba(176,138,74,.25);
+    border-radius:6px;
+    padding: clamp(22px,2.6vw,30px);
+    box-shadow: 0 12px 30px rgba(60,40,20,.08);
+    transition: transform .5s var(--ease-soft), box-shadow .5s var(--ease-soft);
+  }
+  .event:hover{ transform:translateY(-4px); box-shadow:0 20px 40px rgba(60,40,20,.14);}
+  .event::before{
+    content:""; position:absolute; left:14px; right:14px; top:14px; bottom:14px;
+    border:1px solid rgba(176,138,74,.2); pointer-events:none; border-radius:3px;
+  }
+  .event .ev-icon{
+    width:72px; height:72px; display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, #fff8e3 0%, #f6ead1 70%, #e9d5a1 100%);
+    border:1px solid rgba(176,138,74,.35);
+    border-radius:50%; margin:4px auto 14px; color:var(--bougain);
+    box-shadow: 0 6px 14px rgba(60,40,20,.08), inset 0 2px 4px rgba(255,255,255,.6);
+  }
+  .event .ev-ribbon{
+    font-family:'Dancing Script',cursive; color:var(--bougain);
+    font-size:clamp(16px,1.8vw,20px); text-align:center; margin-bottom:.2em;
+  }
+  .event h3{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(22px,2.4vw,28px); color:var(--ink); margin:.1em 0 .3em; text-align:center;}
+  .event .ev-time{font-size:11px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase; margin-bottom:1.1em; text-align:center;}
+  .event .ev-desc{color:var(--ink-soft); font-size:14px; line-height:1.65; margin:.7em 0 1em; font-family:'Cormorant Garamond',serif; font-size:16px; font-style:italic;}
+  .event .ev-venue{display:flex; align-items:flex-start; gap:8px; color:var(--sage-dark); font-size:12.5px; margin-top:.9em; padding-top:.9em; border-top:1px dashed rgba(176,138,74,.25); font-family:'Inter';}
+  .event .ev-venue svg{flex-shrink:0; margin-top:3px;}
+
+  /* Per-event colour accents */
+  .event-vinayak .ev-icon{ color:#C4521C; background: radial-gradient(circle, #fff2d8, #f4d9a0); }
+  .event-haldi   .ev-icon{ color:#B06A20; background: radial-gradient(circle, #fff2cc, #f0c56a); }
+  .event-sangeet .ev-icon{ color:#B4213B; background: radial-gradient(circle, #ffe7ea, #f2bcc2); }
+  .event-wedding{ border-color:rgba(232,90,122,.45); background: linear-gradient(180deg, #fff4e9, #fde6d4); }
+  .event-wedding .ev-icon{ color:#B4213B; background: radial-gradient(circle, #fff2d8, #e9bfae); }
+  .event-wedding .ev-ribbon{ color:#B4213B; }
+
+  /* ========================================================= */
+  /* VENUE                                                      */
+  /* ========================================================= */
+  .venue-card{
+    max-width: 820px; margin: 2.6em auto 0;
+    position:relative;
+    background: linear-gradient(180deg, #fffbe9, var(--paper));
+    border:1px solid rgba(176,138,74,.4);
+    border-radius:6px;
+    padding: clamp(32px,4vw,48px);
+    box-shadow: 0 20px 40px rgba(60,40,20,.1);
+  }
+  .venue-card::after{
+    content:""; position:absolute; inset:-2px; border-radius:8px; padding:1px;
+    background: conic-gradient(from 0deg,
+      transparent 0deg, #D4A52C 90deg, transparent 180deg, #FFE09A 270deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity:.45; animation: slowSpin 20s linear infinite; pointer-events:none;
+  }
+  .venue-card svg.v-arch{width: min(300px, 60%); height:auto; margin: 0 auto 1.4em; display:block;}
+  .venue-card .v-name{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(24px,3vw,32px); color:var(--ink); margin:0;}
+  .venue-card .v-addr{color:var(--ink-soft); margin:.7em 0 1.4em; font-size:15px; line-height:1.6;}
+
+  /* ========================================================= */
+  /* CLOSING                                                    */
+  /* ========================================================= */
+  .closing{
+    position:relative; padding: clamp(100px, 14vh, 160px) 6vw clamp(60px, 8vh, 100px);
+    text-align:center; overflow:hidden;
+  }
+  .closing .closing-arch{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    width:min(900px, 110%); height:auto; opacity:.85;
+  }
+  .closing h2{font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(32px,5vw,52px); margin:.3em 0; color:var(--ink);}
+  .closing .couple{font-family:'Dancing Script',cursive; color:var(--bougain); font-size:clamp(28px,3.5vw,42px); margin-top:1em;}
+  .closing .rsvp{margin-top:2em; font-size:13px; color:var(--ink-soft);}
+  .footer-note{margin-top:3em; font-size:11px; letter-spacing:.3em; color:var(--gold); text-transform:uppercase;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+    #cover{display:none;}
+    main.landing{opacity:1 !important; transform:none !important;}
+    .reveal{opacity:1 !important; transform:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Reusable flower symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Rose: layered pink petals with warm center -->
+    <symbol id="f-rose" viewBox="0 0 50 50">
+      <g>
+        <ellipse cx="25" cy="10" rx="9" ry="12" fill="#E85A7A"/>
+        <ellipse cx="40" cy="20" rx="9" ry="12" fill="#E85A7A" transform="rotate(72 40 20)"/>
+        <ellipse cx="34" cy="38" rx="9" ry="12" fill="#D54568" transform="rotate(144 34 38)"/>
+        <ellipse cx="16" cy="38" rx="9" ry="12" fill="#D54568" transform="rotate(216 16 38)"/>
+        <ellipse cx="10" cy="20" rx="9" ry="12" fill="#E85A7A" transform="rotate(288 10 20)"/>
+        <circle cx="25" cy="25" r="7" fill="#F6B5A3"/>
+        <circle cx="25" cy="25" r="3" fill="#E8A33D"/>
+      </g>
+    </symbol>
+
+    <!-- Deep red rose (the real Indian wedding rose) -->
+    <symbol id="f-red-rose" viewBox="0 0 50 50">
+      <g>
+        <!-- outer petals -->
+        <ellipse cx="25" cy="9" rx="10" ry="13" fill="#B4213B"/>
+        <ellipse cx="41" cy="20" rx="10" ry="13" fill="#B4213B" transform="rotate(72 41 20)"/>
+        <ellipse cx="34" cy="39" rx="10" ry="13" fill="#8E1A2F" transform="rotate(144 34 39)"/>
+        <ellipse cx="16" cy="39" rx="10" ry="13" fill="#8E1A2F" transform="rotate(216 16 39)"/>
+        <ellipse cx="9"  cy="20" rx="10" ry="13" fill="#B4213B" transform="rotate(288 9 20)"/>
+        <!-- inner swirl -->
+        <circle cx="25" cy="25" r="9" fill="#D44761"/>
+        <path d="M 25,19 C 29,21 29,27 25,29 C 21,27 21,21 25,19 Z" fill="#8E1A2F"/>
+        <circle cx="25" cy="25" r="2.5" fill="#5A0A19"/>
+      </g>
+    </symbol>
+
+    <!-- Rose petal (single petal for scattered shower) -->
+    <symbol id="f-rose-petal" viewBox="0 0 50 50">
+      <path d="M 25,6 C 36,14 36,32 25,44 C 14,32 14,14 25,6 Z" fill="#B4213B"/>
+      <path d="M 25,10 C 32,16 32,30 25,40 C 18,30 18,16 25,10 Z" fill="#D44761" opacity=".7"/>
+      <path d="M 25,10 L 25,40" stroke="#8E1A2F" stroke-width="1" opacity=".5"/>
+    </symbol>
+    <!-- Peach blossom: 5 soft petals -->
+    <symbol id="f-blossom" viewBox="0 0 50 50">
+      <g>
+        <ellipse cx="25" cy="11" rx="8" ry="11" fill="#F6B5A3"/>
+        <ellipse cx="38" cy="22" rx="8" ry="11" fill="#F6B5A3" transform="rotate(72 38 22)"/>
+        <ellipse cx="33" cy="38" rx="8" ry="11" fill="#F6B5A3" transform="rotate(144 33 38)"/>
+        <ellipse cx="17" cy="38" rx="8" ry="11" fill="#F6B5A3" transform="rotate(216 17 38)"/>
+        <ellipse cx="12" cy="22" rx="8" ry="11" fill="#F6B5A3" transform="rotate(288 12 22)"/>
+        <circle cx="25" cy="25" r="5" fill="#E8A33D"/>
+      </g>
+    </symbol>
+    <!-- Marigold: dense golden -->
+    <symbol id="f-marigold" viewBox="0 0 50 50">
+      <g>
+        <circle cx="25" cy="9"  r="8" fill="#E8A33D"/>
+        <circle cx="41" cy="20" r="8" fill="#E8A33D"/>
+        <circle cx="37" cy="39" r="8" fill="#D18A2A"/>
+        <circle cx="13" cy="39" r="8" fill="#D18A2A"/>
+        <circle cx="9"  cy="20" r="8" fill="#E8A33D"/>
+        <circle cx="25" cy="25" r="9" fill="#F0B855"/>
+        <circle cx="25" cy="25" r="5" fill="#B06A20"/>
+      </g>
+    </symbol>
+    <!-- Bougainvillea: 3-bract triangular cluster -->
+    <symbol id="f-bougain" viewBox="0 0 50 50">
+      <g>
+        <path d="M25,4 L42,30 L8,30 Z" fill="#E85A7A"/>
+        <path d="M25,46 L8,22  L42,22 Z" fill="#D54568" opacity=".92"/>
+        <circle cx="25" cy="25" r="4" fill="#F6B5A3"/>
+        <circle cx="25" cy="25" r="2" fill="#8E2A3F"/>
+      </g>
+    </symbol>
+
+    <!-- Rajasthani mandala watermark -->
+    <symbol id="mandala" viewBox="0 0 200 200">
+      <g fill="none" stroke="#B08A4A" stroke-width=".9">
+        <circle cx="100" cy="100" r="90"/>
+        <circle cx="100" cy="100" r="72"/>
+        <circle cx="100" cy="100" r="54"/>
+        <circle cx="100" cy="100" r="36"/>
+        <circle cx="100" cy="100" r="18"/>
+        <g transform="translate(100 100)">
+          <g id="m-ray"><path d="M 0,-90 L 4,-72 L 0,-54 L -4,-72 Z"/></g>
+          <use href="#m-ray" transform="rotate(30)"/>
+          <use href="#m-ray" transform="rotate(60)"/>
+          <use href="#m-ray" transform="rotate(90)"/>
+          <use href="#m-ray" transform="rotate(120)"/>
+          <use href="#m-ray" transform="rotate(150)"/>
+          <use href="#m-ray" transform="rotate(180)"/>
+          <use href="#m-ray" transform="rotate(210)"/>
+          <use href="#m-ray" transform="rotate(240)"/>
+          <use href="#m-ray" transform="rotate(270)"/>
+          <use href="#m-ray" transform="rotate(300)"/>
+          <use href="#m-ray" transform="rotate(330)"/>
+          <!-- petal ring -->
+          <g id="m-petal"><path d="M 0,-60 C 10,-70 10,-80 0,-78 C -10,-80 -10,-70 0,-60 Z"/></g>
+          <use href="#m-petal" transform="rotate(45)"/>
+          <use href="#m-petal" transform="rotate(90)"/>
+          <use href="#m-petal" transform="rotate(135)"/>
+          <use href="#m-petal" transform="rotate(180)"/>
+          <use href="#m-petal" transform="rotate(225)"/>
+          <use href="#m-petal" transform="rotate(270)"/>
+          <use href="#m-petal" transform="rotate(315)"/>
+          <!-- inner small petals -->
+          <g id="m-inner"><circle cx="0" cy="-26" r="3" fill="#B08A4A"/></g>
+          <use href="#m-inner" transform="rotate(45)"/>
+          <use href="#m-inner" transform="rotate(90)"/>
+          <use href="#m-inner" transform="rotate(135)"/>
+          <use href="#m-inner" transform="rotate(180)"/>
+          <use href="#m-inner" transform="rotate(225)"/>
+          <use href="#m-inner" transform="rotate(270)"/>
+          <use href="#m-inner" transform="rotate(315)"/>
+        </g>
+      </g>
+    </symbol>
+
+    <!-- Diya (oil lamp) with flame -->
+    <symbol id="diya" viewBox="0 0 40 60">
+      <!-- hanging thread -->
+      <line x1="20" y1="0" x2="20" y2="20" stroke="#8E6A33" stroke-width=".8" opacity=".6"/>
+      <!-- lamp body -->
+      <path d="M 6,34 Q 20,52 34,34 L 34,32 L 6,32 Z" fill="#B08A4A"/>
+      <path d="M 6,32 L 34,32" stroke="#8E6A33" stroke-width="1"/>
+      <!-- flame -->
+      <path d="M 20,30 C 15,22 17,16 20,10 C 23,16 25,22 20,30 Z" fill="#FF7A3D"/>
+      <path d="M 20,28 C 17,22 18,18 20,14 C 22,18 23,22 20,28 Z" fill="#FFB24A"/>
+      <path d="M 20,26 C 18.5,22 19,19 20,17 C 21,19 21.5,22 20,26 Z" fill="#FFD98A"/>
+      <!-- glow -->
+      <circle cx="20" cy="20" r="14" fill="#FFB24A" opacity=".15"/>
+    </symbol>
+
+    <!-- Rajasthani jaali (lattice) column -->
+    <symbol id="jaali" viewBox="0 0 48 400">
+      <g fill="none" stroke="#B08A4A" stroke-width="1" stroke-linecap="round">
+        <path d="M 24,0 L 24,400"/>
+        <circle cx="24" cy="40" r="12"/>
+        <circle cx="24" cy="100" r="12"/>
+        <circle cx="24" cy="160" r="12"/>
+        <circle cx="24" cy="220" r="12"/>
+        <circle cx="24" cy="280" r="12"/>
+        <circle cx="24" cy="340" r="12"/>
+        <path d="M 12,40 L 36,40 M 12,100 L 36,100 M 12,160 L 36,160 M 12,220 L 36,220 M 12,280 L 36,280 M 12,340 L 36,340"/>
+        <path d="M 24,28 L 24,52 M 24,88 L 24,112 M 24,148 L 24,172 M 24,208 L 24,232 M 24,268 L 24,292 M 24,328 L 24,352"/>
+      </g>
+      <g fill="#B08A4A">
+        <circle cx="24" cy="20"  r="2"/>
+        <circle cx="24" cy="70"  r="2"/>
+        <circle cx="24" cy="130" r="2"/>
+        <circle cx="24" cy="190" r="2"/>
+        <circle cx="24" cy="250" r="2"/>
+        <circle cx="24" cy="310" r="2"/>
+        <circle cx="24" cy="380" r="2"/>
+      </g>
+    </symbol>
+
+    <!-- Peacock feather (iconic Rajasthani motif) -->
+    <symbol id="peacock-feather" viewBox="0 0 80 160">
+      <!-- stem -->
+      <path d="M 40,158 C 40,100 36,60 40,8" stroke="#2E6B5A" stroke-width="1.4" fill="none"/>
+      <!-- barbs along stem -->
+      <g stroke="#4A8C72" stroke-width=".8" fill="none" opacity=".65">
+        <path d="M 40,20 C 32,22 28,30 26,38"/><path d="M 40,20 C 48,22 52,30 54,38"/>
+        <path d="M 40,34 C 28,36 22,46 20,56"/><path d="M 40,34 C 52,36 58,46 60,56"/>
+        <path d="M 40,52 C 24,54 16,66 14,78"/><path d="M 40,52 C 56,54 64,66 66,78"/>
+        <path d="M 40,74 C 22,76 12,88 10,100"/><path d="M 40,74 C 58,76 68,88 70,100"/>
+      </g>
+      <!-- eye of the feather -->
+      <ellipse cx="40" cy="20" rx="18" ry="22" fill="#2E6B5A"/>
+      <ellipse cx="40" cy="20" rx="14" ry="18" fill="#4A8C72"/>
+      <ellipse cx="40" cy="20" rx="10" ry="14" fill="#D4A52C"/>
+      <ellipse cx="40" cy="20" rx="6" ry="9" fill="#3B5EAB"/>
+      <ellipse cx="40" cy="20" rx="3" ry="4" fill="#1B2E6B"/>
+      <circle cx="40" cy="18" r="1" fill="#fff" opacity=".7"/>
+    </symbol>
+
+    <!-- Toran (door hanging) with mango leaves + marigold -->
+    <symbol id="toran" viewBox="0 0 400 70">
+      <!-- rope -->
+      <path d="M 0,8 Q 200,24 400,8" fill="none" stroke="#8E6A33" stroke-width="1.4" opacity=".7"/>
+      <!-- hanging mango leaves alternating with marigolds -->
+      <g>
+        <!-- mango leaf shape -->
+        <g id="mango-leaf">
+          <path d="M 0,0 C -10,8 -10,24 0,38 C 10,24 10,8 0,0 Z" fill="#4A8C72"/>
+          <path d="M 0,0 L 0,38" stroke="#2E6B5A" stroke-width=".8" opacity=".7"/>
+        </g>
+      </g>
+      <use href="#mango-leaf" x="20"  y="14"/>
+      <use href="#mango-leaf" x="60"  y="18"/>
+      <use href="#mango-leaf" x="100" y="20"/>
+      <use href="#mango-leaf" x="140" y="22"/>
+      <use href="#mango-leaf" x="180" y="24"/>
+      <use href="#mango-leaf" x="220" y="24"/>
+      <use href="#mango-leaf" x="260" y="22"/>
+      <use href="#mango-leaf" x="300" y="20"/>
+      <use href="#mango-leaf" x="340" y="18"/>
+      <use href="#mango-leaf" x="380" y="14"/>
+      <!-- marigold dangling between leaves -->
+      <g>
+        <circle cx="40"  cy="56" r="6" fill="#E8A33D"/><circle cx="40" cy="56" r="3" fill="#B06A20"/>
+        <circle cx="80"  cy="60" r="7" fill="#E85A7A"/><circle cx="80" cy="60" r="3" fill="#F6B5A3"/>
+        <circle cx="120" cy="62" r="6" fill="#E8A33D"/>
+        <circle cx="160" cy="64" r="7" fill="#E85A7A"/>
+        <circle cx="200" cy="64" r="7" fill="#E8A33D"/>
+        <circle cx="240" cy="64" r="7" fill="#E85A7A"/>
+        <circle cx="280" cy="62" r="6" fill="#E8A33D"/>
+        <circle cx="320" cy="60" r="7" fill="#E85A7A"/>
+        <circle cx="360" cy="56" r="6" fill="#E8A33D"/>
+      </g>
+    </symbol>
+
+    <!-- Kalash (sacred pot with coconut + leaves) -->
+    <symbol id="kalash" viewBox="0 0 80 100">
+      <!-- pot body -->
+      <path d="M 20,88 Q 10,70 14,52 Q 18,42 30,42 L 50,42 Q 62,42 66,52 Q 70,70 60,88 Z" fill="#B08A4A"/>
+      <path d="M 14,52 Q 18,60 40,60 Q 62,60 66,52" fill="none" stroke="#8E6A33" stroke-width="1" opacity=".6"/>
+      <!-- rim -->
+      <ellipse cx="40" cy="42" rx="18" ry="4" fill="#8E6A33"/>
+      <ellipse cx="40" cy="40" rx="18" ry="3" fill="#D7B872"/>
+      <!-- mango leaves fanning out -->
+      <path d="M 24,36 C 18,24 26,14 32,20 C 28,12 36,10 36,20" fill="#4A8C72"/>
+      <path d="M 56,36 C 62,24 54,14 48,20 C 52,12 44,10 44,20" fill="#4A8C72"/>
+      <path d="M 40,32 C 36,20 44,10 40,4 C 36,10 44,20 40,32" fill="#4A8C72"/>
+      <!-- coconut -->
+      <circle cx="40" cy="12" r="7" fill="#8E6A33"/>
+      <circle cx="38" cy="10" r="2" fill="#5A3A1A"/>
+      <!-- decorative tilak on pot -->
+      <path d="M 36,66 L 44,66 M 36,70 L 44,70" stroke="#B4213B" stroke-width="1.4"/>
+      <circle cx="40" cy="74" r="2" fill="#B4213B"/>
+    </symbol>
+
+    <!-- Shubh Vivaah banner (ornate) -->
+    <symbol id="shubh-banner" viewBox="0 0 220 60">
+      <path d="M 10,30 C 30,10 90,10 110,30 C 130,10 190,10 210,30 C 190,50 130,50 110,30 C 90,50 30,50 10,30 Z" fill="none" stroke="#B08A4A" stroke-width="1" opacity=".55"/>
+      <circle cx="110" cy="30" r="4" fill="#B08A4A" opacity=".7"/>
+      <circle cx="40" cy="30" r="2.5" fill="#E85A7A"/>
+      <circle cx="180" cy="30" r="2.5" fill="#E85A7A"/>
+    </symbol>
+
+    <!-- Mehndi corner flourish -->
+    <symbol id="mehndi-corner" viewBox="0 0 100 100">
+      <g fill="none" stroke="#B08A4A" stroke-width="1" stroke-linecap="round">
+        <path d="M 10,10 Q 30,20 40,40 Q 50,60 70,70"/>
+        <path d="M 10,10 Q 20,30 30,50 Q 40,70 60,80" opacity=".6"/>
+        <circle cx="20" cy="20" r="3"/>
+        <circle cx="35" cy="40" r="3"/>
+        <circle cx="55" cy="65" r="3"/>
+        <path d="M 20,20 m -4,-4 l 4,-4 l 4,4 l -4,4 z" opacity=".7"/>
+      </g>
+      <g fill="#E85A7A">
+        <circle cx="18" cy="18" r="2"/>
+        <circle cx="38" cy="43" r="2"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<button class="skip" id="skipBtn" aria-label="Skip the opening invitation">Skip ➝</button>
+
+<!-- Persistent dense flower layer — survives the cover removal and fades
+     out smoothly, so there's no sudden drop in petals when the intro ends. -->
+<div class="flowers intro-persist" id="introFlowers" aria-hidden="true"></div>
+
+<!-- ============================= COVER ============================= -->
+<div id="cover" role="dialog" aria-label="Opening invitation" aria-hidden="false">
+  <div class="paper-grain"></div>
+
+
+  <!-- The 3-D card -->
+  <div class="card-stage">
+    <div class="card-shadow"></div>
+
+    <!-- INSIDE (behind panels) -->
+    <div class="inside">
+      <div class="border-frame"></div>
+
+      <!-- sprigs in inside corners -->
+      <svg class="sprig s-tl" viewBox="0 0 300 300" aria-hidden="true">
+        <g fill="none" stroke="#6C8C5E" stroke-width="1.5" stroke-linecap="round">
+          <path d="M10,10 C 60,80 100,120 150,180"/>
+        </g>
+        <g fill="#6C8C5E"><ellipse cx="50" cy="55" rx="14" ry="5" transform="rotate(40 50 55)"/><ellipse cx="95" cy="100" rx="16" ry="6" transform="rotate(55 95 100)"/><ellipse cx="135" cy="150" rx="18" ry="6" transform="rotate(60 135 150)"/></g>
+        <g><circle cx="70" cy="40" r="8" fill="#E85A7A"/><circle cx="66" cy="46" r="5" fill="#F6B5A3"/><circle cx="140" cy="120" r="10" fill="#E85A7A"/><circle cx="136" cy="128" r="6" fill="#F6B5A3"/><circle cx="170" cy="80" r="7" fill="#E8A33D"/></g>
+      </svg>
+      <svg class="sprig s-tr" viewBox="0 0 300 300" aria-hidden="true">
+        <g fill="none" stroke="#6C8C5E" stroke-width="1.5" stroke-linecap="round"><path d="M10,10 C 60,80 100,120 150,180"/></g>
+        <g fill="#6C8C5E"><ellipse cx="60" cy="60" rx="14" ry="5" transform="rotate(40 60 60)"/><ellipse cx="110" cy="110" rx="16" ry="6" transform="rotate(55 110 110)"/></g>
+        <g><circle cx="80" cy="45" r="9" fill="#E85A7A"/><circle cx="150" cy="110" r="10" fill="#E8A33D"/></g>
+      </svg>
+      <svg class="sprig s-bl" viewBox="0 0 300 300" aria-hidden="true">
+        <g fill="none" stroke="#6C8C5E" stroke-width="1.5" stroke-linecap="round"><path d="M10,10 C 60,80 100,120 150,180"/></g>
+        <g fill="#6C8C5E"><ellipse cx="60" cy="60" rx="14" ry="5" transform="rotate(40 60 60)"/></g>
+        <g><circle cx="80" cy="45" r="9" fill="#E85A7A"/><circle cx="150" cy="110" r="10" fill="#E8A33D"/></g>
+      </svg>
+      <svg class="sprig s-br" viewBox="0 0 300 300" aria-hidden="true">
+        <g fill="none" stroke="#6C8C5E" stroke-width="1.5" stroke-linecap="round"><path d="M10,10 C 60,80 100,120 150,180"/></g>
+        <g fill="#6C8C5E"><ellipse cx="60" cy="60" rx="14" ry="5" transform="rotate(40 60 60)"/></g>
+        <g><circle cx="80" cy="45" r="9" fill="#E85A7A"/></g>
+      </svg>
+
+      <div class="inner-text">
+        <div class="eyebrow">Together with their families</div>
+        <div class="shubh">शुभ विवाह</div>
+        <h1 class="serif">
+          <span>Pooja</span>
+          <span class="amp">&amp;</span>
+          <span>Aman</span>
+        </h1>
+        <div class="rule"></div>
+        <p class="quote">"Surrounded by sacred fire, eternal vows, and beloved families, two souls unite in lifelong devotion and joy."</p>
+        <div class="date">Wednesday · 25 November 2026 · Jodhpur</div>
+      </div>
+    </div>
+
+    <!-- LEFT panel -->
+    <div class="panel panel-left">
+      <div class="corner c-tl">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+            <path class="stroke-draw" d="M10,10 C 80,60 120,120 150,220 M10,10 C 140,30 240,110 300,230"/>
+            <path class="stroke-draw" d="M50,40 C 90,110 140,160 220,200"/>
+          </g>
+          <g fill="#6C8C5E" opacity=".9">
+            <ellipse cx="60" cy="60" rx="14" ry="6" transform="rotate(30 60 60)"/>
+            <ellipse cx="100" cy="110" rx="18" ry="7" transform="rotate(50 100 110)"/>
+            <ellipse cx="150" cy="160" rx="20" ry="8" transform="rotate(60 150 160)"/>
+            <ellipse cx="200" cy="195" rx="22" ry="8" transform="rotate(70 200 195)"/>
+          </g>
+          <g>
+            <circle cx="80" cy="40" r="10" fill="#E85A7A"/><circle cx="76" cy="46" r="7" fill="#F6B5A3"/>
+            <circle cx="150" cy="90" r="12" fill="#E85A7A"/><circle cx="146" cy="97" r="8" fill="#F6B5A3"/>
+            <circle cx="220" cy="150" r="14" fill="#E85A7A"/><circle cx="214" cy="158" r="9" fill="#F6B5A3"/>
+            <circle cx="260" cy="80" r="10" fill="#E8A33D"/><circle cx="256" cy="86" r="6" fill="#F6B5A3"/>
+          </g>
+        </svg>
+      </div>
+      <div class="corner c-bl">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+            <path class="stroke-draw" d="M10,10 C 70,60 120,110 160,210"/>
+          </g>
+          <g fill="#6C8C5E" opacity=".9"><ellipse cx="80" cy="70" rx="16" ry="6" transform="rotate(45 80 70)"/><ellipse cx="140" cy="140" rx="18" ry="7" transform="rotate(55 140 140)"/></g>
+          <g><circle cx="110" cy="60" r="9" fill="#E85A7A"/><circle cx="170" cy="130" r="11" fill="#E8A33D"/></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT panel -->
+    <div class="panel panel-right">
+      <div class="corner c-tr">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+            <path class="stroke-draw" d="M10,10 C 80,60 120,120 150,220 M10,10 C 140,30 240,110 300,230"/>
+          </g>
+          <g fill="#6C8C5E" opacity=".9">
+            <ellipse cx="60" cy="60" rx="14" ry="6" transform="rotate(30 60 60)"/>
+            <ellipse cx="100" cy="110" rx="18" ry="7" transform="rotate(50 100 110)"/>
+            <ellipse cx="150" cy="160" rx="20" ry="8" transform="rotate(60 150 160)"/>
+          </g>
+          <g>
+            <circle cx="80" cy="40" r="10" fill="#E85A7A"/><circle cx="76" cy="46" r="7" fill="#F6B5A3"/>
+            <circle cx="150" cy="90" r="12" fill="#E85A7A"/><circle cx="146" cy="97" r="8" fill="#F6B5A3"/>
+            <circle cx="220" cy="150" r="12" fill="#E8A33D"/>
+          </g>
+        </svg>
+      </div>
+      <div class="corner c-br">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+            <path class="stroke-draw" d="M10,10 C 70,60 120,110 160,210"/>
+          </g>
+          <g fill="#6C8C5E" opacity=".9"><ellipse cx="80" cy="70" rx="16" ry="6" transform="rotate(45 80 70)"/></g>
+          <g><circle cx="110" cy="60" r="10" fill="#E85A7A"/><circle cx="170" cy="130" r="11" fill="#E8A33D"/></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- The fold line down the middle -->
+    <div class="fold-line"></div>
+
+    <!-- Text on the CLOSED cover -->
+    <div class="cover-text">
+      <div class="eyebrow">You are cordially invited</div>
+      <div class="shubh">शुभ विवाह</div>
+      <h1 class="serif">
+        <span>Pooja</span>
+        <span class="amp">&amp;</span>
+        <span>Aman</span>
+      </h1>
+      <div class="rule"></div>
+      <div class="date">Wednesday · 25 November 2026 · Jodhpur</div>
+    </div>
+
+    <!-- Flat gold monogram ornament -->
+    <svg class="monogram" viewBox="0 0 200 36" aria-hidden="true">
+      <g stroke="#B08A4A" stroke-width="1" fill="none" stroke-linecap="round">
+        <line x1="10" y1="18" x2="70" y2="18" opacity=".55"/>
+        <line x1="130" y1="18" x2="190" y2="18" opacity=".55"/>
+        <path d="M70,18 C 76,12 84,12 90,18" opacity=".7"/>
+        <path d="M110,18 C 116,24 124,24 130,18" opacity=".7"/>
+      </g>
+      <g fill="#B08A4A">
+        <circle cx="100" cy="18" r="3"/>
+        <circle cx="70" cy="18" r="2" opacity=".7"/>
+        <circle cx="130" cy="18" r="2" opacity=".7"/>
+      </g>
+      <text x="100" y="23" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="14" fill="#B08A4A" letter-spacing="2">P &amp; A</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ============================= LANDING ============================= -->
+<main class="landing" id="landing" aria-hidden="true">
+
+  <!-- Continuous blessing flowers (populated by JS) -->
+  <div class="bless-wrap flowers" id="blessFlowers" aria-hidden="true"></div>
+
+  <section class="hero">
+
+    <!-- Hanging marigold & rose garland crown -->
+    <svg class="hero-garland" viewBox="0 0 1200 180" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+      <!-- top horizontal cord -->
+      <path d="M -20,8 Q 600,32 1220,8" fill="none" stroke="#8E6A33" stroke-width="1.4" opacity=".55"/>
+
+      <!-- Dangling gold bells between flower strings -->
+      <g>
+        <!-- bell 1 -->
+        <g transform="translate(120,10)">
+          <path d="M 0,0 L 0,8" stroke="#8E6A33" stroke-width="1"/>
+          <path d="M -8,8 Q -8,22 0,30 Q 8,22 8,8 Z" fill="#D4A52C"/>
+          <ellipse cx="0" cy="30" rx="8" ry="2" fill="#8E6A33"/>
+          <circle cx="0" cy="34" r="2" fill="#8E6A33"/>
+        </g>
+        <!-- bell 2 -->
+        <g transform="translate(360,10)">
+          <path d="M 0,0 L 0,8" stroke="#8E6A33" stroke-width="1"/>
+          <path d="M -9,8 Q -9,24 0,32 Q 9,24 9,8 Z" fill="#D4A52C"/>
+          <ellipse cx="0" cy="32" rx="9" ry="2" fill="#8E6A33"/>
+          <circle cx="0" cy="36" r="2.3" fill="#8E6A33"/>
+        </g>
+        <!-- bell 3 (center, larger) -->
+        <g transform="translate(600,10)">
+          <path d="M 0,0 L 0,10" stroke="#8E6A33" stroke-width="1.2"/>
+          <path d="M -11,10 Q -11,28 0,36 Q 11,28 11,10 Z" fill="#D4A52C"/>
+          <path d="M -11,10 L 11,10" stroke="#B08A4A" stroke-width="1"/>
+          <ellipse cx="0" cy="36" rx="11" ry="2.5" fill="#8E6A33"/>
+          <circle cx="0" cy="40" r="2.5" fill="#8E6A33"/>
+        </g>
+        <!-- bell 4 -->
+        <g transform="translate(840,10)">
+          <path d="M 0,0 L 0,8" stroke="#8E6A33" stroke-width="1"/>
+          <path d="M -9,8 Q -9,24 0,32 Q 9,24 9,8 Z" fill="#D4A52C"/>
+          <ellipse cx="0" cy="32" rx="9" ry="2" fill="#8E6A33"/>
+          <circle cx="0" cy="36" r="2.3" fill="#8E6A33"/>
+        </g>
+        <!-- bell 5 -->
+        <g transform="translate(1080,10)">
+          <path d="M 0,0 L 0,8" stroke="#8E6A33" stroke-width="1"/>
+          <path d="M -8,8 Q -8,22 0,30 Q 8,22 8,8 Z" fill="#D4A52C"/>
+          <ellipse cx="0" cy="30" rx="8" ry="2" fill="#8E6A33"/>
+          <circle cx="0" cy="34" r="2" fill="#8E6A33"/>
+        </g>
+      </g>
+      <!-- 10 hanging strings with marigolds/roses -->
+      <g fill="none" stroke="#6C8C5E" stroke-width="1.2" stroke-linecap="round" opacity=".85">
+        <path d="M 60,14   C 55,70 65,100 60,160"/>
+        <path d="M 180,20  C 185,70 175,110 180,170"/>
+        <path d="M 300,16  C 295,80 305,120 300,160"/>
+        <path d="M 420,22  C 425,70 415,110 420,165"/>
+        <path d="M 540,16  C 535,80 545,130 540,170"/>
+        <path d="M 660,22  C 665,80 655,120 660,160"/>
+        <path d="M 780,16  C 775,70 785,110 780,170"/>
+        <path d="M 900,22  C 905,80 895,130 900,165"/>
+        <path d="M 1020,16 C 1015,70 1025,100 1020,160"/>
+        <path d="M 1140,22 C 1145,80 1135,120 1140,170"/>
+      </g>
+      <!-- marigold + rose dots along each string -->
+      <g>
+        <!-- string 1 -->
+        <circle cx="60" cy="40"  r="7" fill="#E8A33D"/><circle cx="60" cy="40" r="3" fill="#B06A20"/>
+        <circle cx="62" cy="72"  r="8" fill="#E85A7A"/><circle cx="60" cy="78" r="4" fill="#F6B5A3"/>
+        <circle cx="59" cy="110" r="7" fill="#E8A33D"/>
+        <circle cx="61" cy="142" r="8" fill="#E85A7A"/>
+        <!-- string 2 -->
+        <circle cx="180" cy="50" r="8" fill="#E85A7A"/><circle cx="178" cy="56" r="4" fill="#F6B5A3"/>
+        <circle cx="182" cy="86" r="7" fill="#E8A33D"/>
+        <circle cx="179" cy="120" r="8" fill="#E85A7A"/>
+        <circle cx="181" cy="152" r="7" fill="#E8A33D"/>
+        <!-- string 3 -->
+        <circle cx="300" cy="46" r="7" fill="#E8A33D"/>
+        <circle cx="302" cy="78" r="8" fill="#E85A7A"/><circle cx="300" cy="84" r="4" fill="#F6B5A3"/>
+        <circle cx="299" cy="112" r="7" fill="#E8A33D"/>
+        <circle cx="301" cy="144" r="8" fill="#E85A7A"/>
+        <!-- string 4 -->
+        <circle cx="420" cy="52" r="8" fill="#E85A7A"/><circle cx="418" cy="58" r="4" fill="#F6B5A3"/>
+        <circle cx="422" cy="88" r="7" fill="#E8A33D"/>
+        <circle cx="419" cy="122" r="8" fill="#E85A7A"/>
+        <circle cx="421" cy="154" r="7" fill="#E8A33D"/>
+        <!-- string 5 -->
+        <circle cx="540" cy="46" r="7" fill="#E8A33D"/>
+        <circle cx="542" cy="78" r="8" fill="#E85A7A"/><circle cx="540" cy="84" r="4" fill="#F6B5A3"/>
+        <circle cx="539" cy="112" r="7" fill="#E8A33D"/>
+        <circle cx="541" cy="144" r="8" fill="#E85A7A"/>
+        <!-- string 6 -->
+        <circle cx="660" cy="52" r="8" fill="#E85A7A"/><circle cx="658" cy="58" r="4" fill="#F6B5A3"/>
+        <circle cx="662" cy="88" r="7" fill="#E8A33D"/>
+        <circle cx="659" cy="122" r="8" fill="#E85A7A"/>
+        <circle cx="661" cy="154" r="7" fill="#E8A33D"/>
+        <!-- string 7 -->
+        <circle cx="780" cy="46" r="7" fill="#E8A33D"/>
+        <circle cx="782" cy="78" r="8" fill="#E85A7A"/><circle cx="780" cy="84" r="4" fill="#F6B5A3"/>
+        <circle cx="779" cy="112" r="7" fill="#E8A33D"/>
+        <circle cx="781" cy="144" r="8" fill="#E85A7A"/>
+        <!-- string 8 -->
+        <circle cx="900" cy="52" r="8" fill="#E85A7A"/><circle cx="898" cy="58" r="4" fill="#F6B5A3"/>
+        <circle cx="902" cy="88" r="7" fill="#E8A33D"/>
+        <circle cx="899" cy="122" r="8" fill="#E85A7A"/>
+        <circle cx="901" cy="154" r="7" fill="#E8A33D"/>
+        <!-- string 9 -->
+        <circle cx="1020" cy="46" r="7" fill="#E8A33D"/>
+        <circle cx="1022" cy="78" r="8" fill="#E85A7A"/><circle cx="1020" cy="84" r="4" fill="#F6B5A3"/>
+        <circle cx="1019" cy="112" r="7" fill="#E8A33D"/>
+        <circle cx="1021" cy="144" r="8" fill="#E85A7A"/>
+        <!-- string 10 -->
+        <circle cx="1140" cy="52" r="8" fill="#E85A7A"/><circle cx="1138" cy="58" r="4" fill="#F6B5A3"/>
+        <circle cx="1142" cy="88" r="7" fill="#E8A33D"/>
+        <circle cx="1139" cy="122" r="8" fill="#E85A7A"/>
+        <circle cx="1141" cy="154" r="7" fill="#E8A33D"/>
+      </g>
+    </svg>
+
+    <div class="sparkle-field" id="heroSparkles" aria-hidden="true"></div>
+
+    <div class="hero-inner">
+      <div class="shubh">शुभ विवाह</div>
+      <div class="eyebrow">Together with their families</div>
+      <h1 tabindex="-1" id="heroName">
+        <span>Pooja</span>
+        <span class="amp script">&amp;</span>
+        <span>Aman</span>
+      </h1>
+      <div class="surname">Mathur · Mathur</div>
+      <div class="date">Wednesday · 25 November 2026 · Jodhpur</div>
+    </div>
+
+    <!-- MANDAP + FIRE at bottom -->
+    <div class="mandap-wrap" aria-hidden="true">
+      <svg class="mandap" viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pillar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#B08A4A" stop-opacity=".18"/>
+            <stop offset="100%" stop-color="#8E6A33" stop-opacity=".35"/>
+          </linearGradient>
+          <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#B08A4A" stop-opacity=".28"/>
+            <stop offset="100%" stop-color="#8E6A33" stop-opacity=".10"/>
+          </linearGradient>
+          <linearGradient id="mandapFire" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#FF7A3D"/>
+            <stop offset="55%" stop-color="#FFB24A"/>
+            <stop offset="100%" stop-color="#FFD98A"/>
+          </linearGradient>
+          <radialGradient id="mandapGlow" cx="50%" cy="60%" r="50%">
+            <stop offset="0%" stop-color="#FFB24A" stop-opacity=".55"/>
+            <stop offset="55%" stop-color="#FF7A3D" stop-opacity=".2"/>
+            <stop offset="100%" stop-color="#FF7A3D" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- ============ PROPER FLORAL WEDDING MANDAP ============ -->
+        <defs>
+          <linearGradient id="pillarWood" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"  stop-color="#8E6A33" stop-opacity=".55"/>
+            <stop offset="50%" stop-color="#B08A4A" stop-opacity=".75"/>
+            <stop offset="100%" stop-color="#8E6A33" stop-opacity=".55"/>
+          </linearGradient>
+          <linearGradient id="canopy" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#D4A52C" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#B08A4A" stop-opacity=".28"/>
+          </linearGradient>
+          <linearGradient id="plinth" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#B08A4A" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#8E6A33" stop-opacity=".5"/>
+          </linearGradient>
+        </defs>
+
+        <!-- carpet / rangoli base -->
+        <path d="M 180,500 Q 600,480 1020,500 L 1020,520 L 180,520 Z" fill="#B4213B" opacity=".18"/>
+        <path d="M 220,490 Q 600,476 980,490" fill="none" stroke="#B08A4A" stroke-width="1.4" opacity=".55"/>
+
+        <!-- stepped platform / stage -->
+        <rect x="220" y="450" width="760" height="42" fill="url(#plinth)"/>
+        <rect x="200" y="440" width="800" height="14" fill="#8E6A33" opacity=".45"/>
+        <!-- stage frieze scrollwork -->
+        <g fill="none" stroke="#B08A4A" stroke-width="1" opacity=".55">
+          <path d="M 230,470 Q 245,460 260,470 Q 275,460 290,470"/>
+          <path d="M 310,470 Q 325,460 340,470 Q 355,460 370,470"/>
+          <path d="M 390,470 Q 405,460 420,470 Q 435,460 450,470"/>
+          <path d="M 470,470 Q 485,460 500,470 Q 515,460 530,470"/>
+          <path d="M 670,470 Q 685,460 700,470 Q 715,460 730,470"/>
+          <path d="M 750,470 Q 765,460 780,470 Q 795,460 810,470"/>
+          <path d="M 830,470 Q 845,460 860,470 Q 875,460 890,470"/>
+          <path d="M 910,470 Q 925,460 940,470 Q 955,460 970,470"/>
+        </g>
+
+        <!-- 4 ornate pillars -->
+        <g>
+          <!-- front left -->
+          <rect x="256" y="200" width="44" height="252" fill="url(#pillarWood)"/>
+          <rect x="246" y="190" width="64" height="18" fill="#8E6A33" opacity=".6"/>
+          <rect x="250" y="440" width="56" height="14" fill="#8E6A33" opacity=".6"/>
+          <path d="M 256,220 L 300,220 M 256,250 L 300,250 M 256,370 L 300,370 M 256,400 L 300,400" stroke="#8E6A33" stroke-width=".7" opacity=".6"/>
+          <circle cx="278" cy="212" r="3.5" fill="#D4A52C" opacity=".8"/>
+          <circle cx="278" cy="448" r="3.5" fill="#D4A52C" opacity=".8"/>
+
+          <!-- front right -->
+          <rect x="900" y="200" width="44" height="252" fill="url(#pillarWood)"/>
+          <rect x="890" y="190" width="64" height="18" fill="#8E6A33" opacity=".6"/>
+          <rect x="894" y="440" width="56" height="14" fill="#8E6A33" opacity=".6"/>
+          <path d="M 900,220 L 944,220 M 900,250 L 944,250 M 900,370 L 944,370 M 900,400 L 944,400" stroke="#8E6A33" stroke-width=".7" opacity=".6"/>
+          <circle cx="922" cy="212" r="3.5" fill="#D4A52C" opacity=".8"/>
+          <circle cx="922" cy="448" r="3.5" fill="#D4A52C" opacity=".8"/>
+
+          <!-- back pillars -->
+          <rect x="420" y="220" width="30" height="230" fill="url(#pillarWood)" opacity=".65"/>
+          <rect x="412" y="212" width="46" height="12" fill="#8E6A33" opacity=".45"/>
+          <rect x="750" y="220" width="30" height="230" fill="url(#pillarWood)" opacity=".65"/>
+          <rect x="742" y="212" width="46" height="12" fill="#8E6A33" opacity=".45"/>
+        </g>
+
+        <!-- ornate top beam / pediment -->
+        <rect x="220" y="170" width="760" height="26" fill="url(#canopy)"/>
+        <path d="M 220,170 L 240,148 L 960,148 L 980,170 Z" fill="url(#canopy)"/>
+        <path d="M 220,170 L 980,170" stroke="#D4A52C" stroke-width="2" opacity=".7"/>
+        <path d="M 240,148 L 960,148" stroke="#D4A52C" stroke-width="1.4" opacity=".65"/>
+        <!-- scalloped eaves -->
+        <g fill="url(#canopy)">
+          <path d="M 240,196 Q 260,210 280,196 Z"/>
+          <path d="M 280,196 Q 300,210 320,196 Z"/>
+          <path d="M 320,196 Q 340,210 360,196 Z"/>
+          <path d="M 360,196 Q 380,210 400,196 Z"/>
+          <path d="M 400,196 Q 420,210 440,196 Z"/>
+          <path d="M 440,196 Q 460,210 480,196 Z"/>
+          <path d="M 480,196 Q 500,210 520,196 Z"/>
+          <path d="M 520,196 Q 540,210 560,196 Z"/>
+          <path d="M 560,196 Q 580,210 600,196 Z"/>
+          <path d="M 600,196 Q 620,210 640,196 Z"/>
+          <path d="M 640,196 Q 660,210 680,196 Z"/>
+          <path d="M 680,196 Q 700,210 720,196 Z"/>
+          <path d="M 720,196 Q 740,210 760,196 Z"/>
+          <path d="M 760,196 Q 780,210 800,196 Z"/>
+          <path d="M 800,196 Q 820,210 840,196 Z"/>
+          <path d="M 840,196 Q 860,210 880,196 Z"/>
+          <path d="M 880,196 Q 900,210 920,196 Z"/>
+          <path d="M 920,196 Q 940,210 960,196 Z"/>
+        </g>
+        <!-- central roof medallion -->
+        <g transform="translate(600,138)">
+          <circle r="18" fill="#D4A52C" opacity=".7"/>
+          <circle r="11" fill="#B4213B" opacity=".9"/>
+          <circle r="4" fill="#D4A52C"/>
+        </g>
+        <!-- side finials -->
+        <g>
+          <path d="M 228,148 L 228,124 L 240,112 L 252,124 L 252,148 Z" fill="#D4A52C" opacity=".7"/>
+          <circle cx="240" cy="110" r="3.5" fill="#8E6A33"/>
+          <path d="M 948,148 L 948,124 L 960,112 L 972,124 L 972,148 Z" fill="#D4A52C" opacity=".7"/>
+          <circle cx="960" cy="110" r="3.5" fill="#8E6A33"/>
+        </g>
+
+        <!-- MANGO LEAF + MARIGOLD TORAN draping under the roof -->
+        <path d="M 240,210 Q 600,268 960,210" fill="none" stroke="#4A8C72" stroke-width="2" opacity=".8"/>
+        <g fill="#4A8C72">
+          <path d="M 280,218 C 274,232 288,246 292,232 C 294,222 288,214 280,218 Z"/>
+          <path d="M 340,232 C 334,248 348,262 352,246 C 354,236 348,228 340,232 Z"/>
+          <path d="M 400,242 C 394,258 408,272 412,256 C 414,246 408,238 400,242 Z"/>
+          <path d="M 460,250 C 454,266 468,280 472,264 C 474,254 468,246 460,250 Z"/>
+          <path d="M 520,254 C 514,270 528,284 532,268 C 534,258 528,250 520,254 Z"/>
+          <path d="M 580,256 C 574,272 588,286 592,270 C 594,260 588,252 580,256 Z"/>
+          <path d="M 620,256 C 614,272 628,286 632,270 C 634,260 628,252 620,256 Z"/>
+          <path d="M 680,254 C 674,270 688,284 692,268 C 694,258 688,250 680,254 Z"/>
+          <path d="M 740,250 C 734,266 748,280 752,264 C 754,254 748,246 740,250 Z"/>
+          <path d="M 800,242 C 794,258 808,272 812,256 C 814,246 808,238 800,242 Z"/>
+          <path d="M 860,232 C 854,248 868,262 872,246 C 874,236 868,228 860,232 Z"/>
+          <path d="M 920,218 C 914,232 928,246 932,232 C 934,222 928,214 920,218 Z"/>
+        </g>
+        <g>
+          <circle cx="310" cy="232" r="7" fill="#E8A33D"/><circle cx="310" cy="232" r="3.5" fill="#B06A20"/>
+          <circle cx="370" cy="248" r="8" fill="#E85A7A"/><circle cx="370" cy="248" r="4" fill="#F6B5A3"/>
+          <circle cx="430" cy="262" r="7" fill="#E8A33D"/><circle cx="430" cy="262" r="3.5" fill="#B06A20"/>
+          <circle cx="490" cy="272" r="8" fill="#E85A7A"/><circle cx="490" cy="272" r="4" fill="#F6B5A3"/>
+          <circle cx="550" cy="278" r="7" fill="#E8A33D"/><circle cx="550" cy="278" r="3.5" fill="#B06A20"/>
+          <circle cx="600" cy="282" r="8" fill="#E85A7A"/><circle cx="600" cy="282" r="4" fill="#F6B5A3"/>
+          <circle cx="650" cy="278" r="7" fill="#E8A33D"/><circle cx="650" cy="278" r="3.5" fill="#B06A20"/>
+          <circle cx="710" cy="272" r="8" fill="#E85A7A"/><circle cx="710" cy="272" r="4" fill="#F6B5A3"/>
+          <circle cx="770" cy="262" r="7" fill="#E8A33D"/><circle cx="770" cy="262" r="3.5" fill="#B06A20"/>
+          <circle cx="830" cy="248" r="8" fill="#E85A7A"/><circle cx="830" cy="248" r="4" fill="#F6B5A3"/>
+          <circle cx="890" cy="232" r="7" fill="#E8A33D"/><circle cx="890" cy="232" r="3.5" fill="#B06A20"/>
+        </g>
+
+        <!-- hanging floral strings down the inside of each front pillar -->
+        <g>
+          <path d="M 322,210 L 324,440" stroke="#4A8C72" stroke-width="1.4" opacity=".65"/>
+          <g>
+            <circle cx="323" cy="240" r="5" fill="#E85A7A"/>
+            <circle cx="323" cy="275" r="6" fill="#E8A33D"/>
+            <circle cx="323" cy="310" r="5" fill="#E85A7A"/>
+            <circle cx="323" cy="345" r="6" fill="#E8A33D"/>
+            <circle cx="323" cy="380" r="5" fill="#E85A7A"/>
+            <circle cx="323" cy="415" r="6" fill="#E8A33D"/>
+          </g>
+          <path d="M 878,210 L 880,440" stroke="#4A8C72" stroke-width="1.4" opacity=".65"/>
+          <g>
+            <circle cx="879" cy="240" r="5" fill="#E85A7A"/>
+            <circle cx="879" cy="275" r="6" fill="#E8A33D"/>
+            <circle cx="879" cy="310" r="5" fill="#E85A7A"/>
+            <circle cx="879" cy="345" r="6" fill="#E8A33D"/>
+            <circle cx="879" cy="380" r="5" fill="#E85A7A"/>
+            <circle cx="879" cy="415" r="6" fill="#E8A33D"/>
+          </g>
+        </g>
+
+        <!-- banana plants at the base of each front pillar -->
+        <g>
+          <g transform="translate(230,440)">
+            <path d="M 0,0 L 0,-70" stroke="#4A8C72" stroke-width="3.5" fill="none"/>
+            <path d="M 0,-45 C -24,-62 -36,-86 -32,-104 C -18,-88 -4,-68 0,-45 Z" fill="#4A8C72"/>
+            <path d="M 0,-60 C 18,-70 36,-76 48,-68 C 36,-60 18,-60 0,-60 Z" fill="#5BA083"/>
+            <path d="M 0,-25 C -18,-34 -32,-32 -36,-20 C -24,-24 -10,-26 0,-25 Z" fill="#4A8C72"/>
+            <path d="M 0,-12 C 16,-14 26,-6 26,2 C 16,2 6,0 0,-12 Z" fill="#5BA083"/>
+          </g>
+          <g transform="translate(970,440)">
+            <path d="M 0,0 L 0,-70" stroke="#4A8C72" stroke-width="3.5" fill="none"/>
+            <path d="M 0,-45 C 24,-62 36,-86 32,-104 C 18,-88 4,-68 0,-45 Z" fill="#4A8C72"/>
+            <path d="M 0,-60 C -18,-70 -36,-76 -48,-68 C -36,-60 -18,-60 0,-60 Z" fill="#5BA083"/>
+            <path d="M 0,-25 C 18,-34 32,-32 36,-20 C 24,-24 10,-26 0,-25 Z" fill="#4A8C72"/>
+            <path d="M 0,-12 C -16,-14 -26,-6 -26,2 C -16,2 -6,0 0,-12 Z" fill="#5BA083"/>
+          </g>
+        </g>
+      </svg>
+
+    </div>
+
+    <!-- Agnikund removed in v13 — kept here hidden -->
+    <svg class="agnikund" viewBox="0 0 220 300" aria-hidden="true" style="display:none">
+      <defs>
+        <linearGradient id="kundTier1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C4663B"/>
+          <stop offset="100%" stop-color="#8B4513"/>
+        </linearGradient>
+        <linearGradient id="kundTier2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#B5693C"/>
+          <stop offset="100%" stop-color="#7A3A14"/>
+        </linearGradient>
+        <linearGradient id="kundTier3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#A0552B"/>
+          <stop offset="100%" stop-color="#5A2E12"/>
+        </linearGradient>
+        <linearGradient id="bigFire" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#E04A1F"/>
+          <stop offset="30%" stop-color="#FF7A3D"/>
+          <stop offset="70%" stop-color="#FFB24A"/>
+          <stop offset="100%" stop-color="#FFE09A"/>
+        </linearGradient>
+        <radialGradient id="agniAura" cx="50%" cy="55%" r="50%">
+          <stop offset="0%" stop-color="#FFB24A" stop-opacity=".65"/>
+          <stop offset="55%" stop-color="#FF7A3D" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="#FF7A3D" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- warm aura glow behind fire (compact) -->
+      <circle class="agni-glow" cx="110" cy="180" r="70" fill="url(#agniAura)"/>
+
+      <!-- 3 stepped tiers (base -> top) -->
+      <path d="M 20,290 L 200,290 L 180,262 L 40,262 Z" fill="url(#kundTier1)"/>
+      <path d="M 40,262 L 180,262 L 162,236 L 58,236 Z" fill="url(#kundTier2)"/>
+      <path d="M 58,236 L 162,236 L 146,210 L 74,210 Z" fill="url(#kundTier3)"/>
+      <!-- tier highlights -->
+      <path d="M 40,262 L 180,262" stroke="#D7A074" stroke-width="1" opacity=".6"/>
+      <path d="M 58,236 L 162,236" stroke="#D7A074" stroke-width="1" opacity=".55"/>
+      <!-- top kund rim -->
+      <ellipse cx="110" cy="210" rx="36" ry="5" fill="#2A1A0A"/>
+      <ellipse cx="110" cy="208" rx="30" ry="3" fill="#5A3A1A"/>
+
+      <!-- scrollwork on tiers -->
+      <g fill="none" stroke="#F6D6A0" stroke-width="1" opacity=".55" stroke-linecap="round">
+        <path d="M 60,278 Q 70,272 80,278 Q 90,272 100,278"/>
+        <path d="M 120,278 Q 130,272 140,278 Q 150,272 160,278"/>
+        <path d="M 76,252 Q 86,246 96,252 Q 106,246 116,252 Q 126,246 136,252"/>
+      </g>
+      <!-- marigolds on tiers -->
+      <g>
+        <circle cx="40"  cy="275" r="4" fill="#E8A33D"/><circle cx="40" cy="275" r="2" fill="#B06A20"/>
+        <circle cx="180" cy="275" r="4" fill="#E8A33D"/><circle cx="180" cy="275" r="2" fill="#B06A20"/>
+        <circle cx="58"  cy="248" r="4" fill="#E85A7A"/>
+        <circle cx="162" cy="248" r="4" fill="#E85A7A"/>
+        <circle cx="74"  cy="222" r="3.5" fill="#E8A33D"/>
+        <circle cx="146" cy="222" r="3.5" fill="#E8A33D"/>
+      </g>
+
+      <!-- Compact flames contained inside the kund area -->
+      <g>
+        <path class="agni-flame" d="M 110,205 C 80,180 90,150 100,130 C 103,142 108,138 110,120 C 112,138 117,142 120,130 C 130,150 140,180 110,205 Z" fill="url(#bigFire)"/>
+        <path class="agni-flame mid" d="M 110,205 C 88,185 95,160 110,140 C 125,160 132,185 110,205 Z" fill="#FFB24A" opacity=".95"/>
+        <path class="agni-flame small" d="M 110,202 C 100,185 103,170 110,155 C 117,170 120,185 110,202 Z" fill="#FFE09A"/>
+        <!-- bright hot core -->
+        <ellipse cx="110" cy="188" rx="5" ry="10" fill="#FFF8DC" opacity=".7"/>
+      </g>
+
+      <!-- rising embers (closer to flame top) -->
+      <circle class="agni-ember e1" cx="110" cy="120" r="2" fill="#FFB24A"/>
+      <circle class="agni-ember e2" cx="103" cy="128" r="1.6" fill="#FFB24A"/>
+      <circle class="agni-ember e3" cx="117" cy="128" r="1.6" fill="#FFB24A"/>
+    </svg>
+
+    <!-- Elephant removed in v13 — hidden -->
+    <svg class="ganesha-corner" viewBox="0 0 220 180" aria-hidden="true" style="display:none">
+      <defs>
+        <linearGradient id="ele-silk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#B4213B"/>
+          <stop offset="100%" stop-color="#8A1A2F"/>
+        </linearGradient>
+      </defs>
+      <g fill="none" stroke="#5A3A1A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <!-- body silhouette -->
+        <path d="M 56,118 C 56,100 68,88 90,86 L 150,86 C 170,86 186,96 190,116 L 190,138 L 174,138 L 174,146 L 160,146 L 160,138 L 108,138 L 108,146 L 94,146 L 94,138 L 78,138 L 78,126 C 64,126 56,122 56,118 Z" fill="#F3E3BF"/>
+        <!-- head -->
+        <path d="M 56,118 C 34,118 22,100 30,80 C 36,66 56,62 70,74 C 76,80 76,92 70,100 C 66,106 60,112 56,118 Z" fill="#F3E3BF"/>
+        <!-- ear -->
+        <path d="M 36,74 C 22,78 20,96 32,106 C 44,104 50,92 48,78 C 46,70 40,70 36,74 Z" fill="#E9D5A1"/>
+        <!-- trunk gracefully curled upward holding lotus -->
+        <path d="M 42,108 C 30,114 20,106 16,92 C 14,78 22,66 36,62 C 46,60 54,66 52,74" stroke-width="7" fill="none"/>
+        <!-- small decorative rings along trunk -->
+        <path d="M 28,104 L 36,104 M 22,92 L 30,92 M 22,78 L 30,78" stroke-width="1" stroke="#B08A4A"/>
+        <!-- tusk -->
+        <path d="M 48,116 C 46,122 42,124 38,124" stroke="#fff" stroke-width="3" fill="none"/>
+        <!-- eye -->
+        <circle cx="56" cy="92" r="2" fill="#2B2320" stroke="none"/>
+        <circle cx="56" cy="92" r=".7" fill="#fff" stroke="none"/>
+        <!-- forehead tilak -->
+        <path d="M 50,80 L 54,74 L 58,80 Z" fill="#B4213B" stroke="none"/>
+        <circle cx="54" cy="84" r="1.5" fill="#B4213B" stroke="none"/>
+      </g>
+
+      <!-- Howdah silk saddle with Rajasthani embroidery -->
+      <path d="M 70,96 C 90,88 150,88 180,96 L 178,118 C 150,124 90,124 72,118 Z" fill="url(#ele-silk)"/>
+      <!-- gold border on saddle -->
+      <path d="M 70,96 C 90,88 150,88 180,96" fill="none" stroke="#D4A52C" stroke-width="1.4"/>
+      <path d="M 72,118 C 90,124 150,124 178,118" fill="none" stroke="#D4A52C" stroke-width="1.4"/>
+      <!-- embroidery dots on saddle -->
+      <g fill="#D4A52C">
+        <circle cx="90" cy="104" r="1.4"/><circle cx="105" cy="108" r="1.4"/>
+        <circle cx="120" cy="104" r="1.4"/><circle cx="135" cy="108" r="1.4"/>
+        <circle cx="150" cy="104" r="1.4"/><circle cx="165" cy="108" r="1.4"/>
+      </g>
+      <!-- paisley at saddle center -->
+      <path d="M 125,110 C 128,104 136,104 136,110 C 134,114 128,114 125,110 Z" fill="#F3E3BF" opacity=".9"/>
+      <!-- gold tassels dangling under saddle -->
+      <g stroke="#D4A52C" stroke-width="1" stroke-linecap="round">
+        <path d="M 80,122 L 80,132"/><path d="M 85,122 L 85,134"/>
+        <path d="M 170,122 L 170,132"/><path d="M 165,122 L 165,134"/>
+      </g>
+
+      <!-- crown / chhatra over the head -->
+      <g>
+        <path d="M 42,56 L 58,56 L 58,62 L 42,62 Z" fill="#D4A52C"/>
+        <path d="M 44,56 L 44,46 L 56,46 L 56,56" fill="#D4A52C"/>
+        <path d="M 50,46 L 50,38" stroke="#8E6A33" stroke-width="1.2"/>
+        <circle cx="50" cy="36" r="2" fill="#B4213B"/>
+      </g>
+
+      <!-- Lotus held in the raised trunk -->
+      <g transform="translate(32,56)">
+        <!-- outer petals -->
+        <path d="M 0,-10 C 6,-6 6,2 0,8 C -6,2 -6,-6 0,-10 Z" fill="#E85A7A"/>
+        <path d="M -8,-6 C -3,-10 2,-6 -2,2 C -8,0 -10,-2 -8,-6 Z" fill="#F6B5A3"/>
+        <path d="M 8,-6 C 3,-10 -2,-6 2,2 C 8,0 10,-2 8,-6 Z" fill="#F6B5A3"/>
+        <circle cx="0" cy="-2" r="2" fill="#E8A33D"/>
+        <!-- stem -->
+        <path d="M 0,8 L 2,20" stroke="#4A8C72" stroke-width="1.4" fill="none"/>
+      </g>
+
+      <!-- Anklet bells on legs -->
+      <g fill="#D4A52C">
+        <circle cx="94" cy="148" r="2"/>
+        <circle cx="108" cy="148" r="2"/>
+        <circle cx="160" cy="148" r="2"/>
+        <circle cx="174" cy="148" r="2"/>
+      </g>
+
+      <!-- toenails -->
+      <g fill="#2B2320" opacity=".55">
+        <circle cx="80" cy="146" r="1"/><circle cx="88" cy="146" r="1"/>
+        <circle cx="94" cy="146" r="1"/><circle cx="108" cy="146" r="1"/>
+        <circle cx="160" cy="146" r="1"/><circle cx="174" cy="146" r="1"/>
+      </g>
+
+      <!-- tail with tassel -->
+      <path d="M 190,120 C 198,124 202,132 198,140" fill="none" stroke="#5A3A1A" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="198" cy="142" r="2.4" fill="#D4A52C"/>
+    </svg>
+
+  </section>
+
+  <!-- ============== PULL QUOTE ============== -->
+  <section class="pullquote reveal">
+    <div class="sparkle-field" id="pullquoteSparkles" aria-hidden="true"></div>
+    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
+    <svg class="peacock-left" aria-hidden="true"><use href="#peacock-feather"/></svg>
+    <svg class="peacock-right" aria-hidden="true"><use href="#peacock-feather"/></svg>
+    <svg class="corner left" viewBox="0 0 220 220" aria-hidden="true">
+      <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+        <path d="M 10,30 C 50,70 90,110 140,180"/>
+        <path d="M 25,20 C 70,40 100,80 150,130" opacity=".6"/>
+      </g>
+      <g fill="#6C8C5E">
+        <ellipse cx="50" cy="60" rx="16" ry="6" transform="rotate(40 50 60)"/>
+        <ellipse cx="90" cy="100" rx="18" ry="7" transform="rotate(50 90 100)"/>
+        <ellipse cx="130" cy="140" rx="20" ry="7" transform="rotate(55 130 140)"/>
+      </g>
+      <g>
+        <circle cx="60" cy="40" r="9" fill="#E85A7A"/><circle cx="58" cy="46" r="5" fill="#F6B5A3"/>
+        <circle cx="110" cy="90" r="11" fill="#E8A33D"/><circle cx="108" cy="96" r="6" fill="#F6B5A3"/>
+        <circle cx="160" cy="140" r="10" fill="#E85A7A"/>
+      </g>
+    </svg>
+    <svg class="corner right" viewBox="0 0 220 220" aria-hidden="true">
+      <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+        <path d="M 10,30 C 50,70 90,110 140,180"/>
+      </g>
+      <g fill="#6C8C5E"><ellipse cx="50" cy="60" rx="16" ry="6" transform="rotate(40 50 60)"/><ellipse cx="90" cy="100" rx="18" ry="7" transform="rotate(50 90 100)"/></g>
+      <g><circle cx="60" cy="40" r="9" fill="#E85A7A"/><circle cx="110" cy="90" r="11" fill="#E8A33D"/></g>
+    </svg>
+
+    <!-- rose petal bloom around the quote -->
+    <div class="petal-bloom" aria-hidden="true">
+      <span class="bloom-petal" style="--d:9s;--delay:0s;  top:28%; left:18%;"><svg viewBox="0 0 50 50"><use href="#f-rose"/></svg></span>
+      <span class="bloom-petal" style="--d:10s;--delay:.6s; top:62%; left:14%;"><svg viewBox="0 0 50 50"><use href="#f-blossom"/></svg></span>
+      <span class="bloom-petal" style="--d:11s;--delay:1.2s;top:20%; left:34%;"><svg viewBox="0 0 50 50"><use href="#f-marigold"/></svg></span>
+      <span class="bloom-petal" style="--d:9s; --delay:1.6s;top:70%; left:36%;"><svg viewBox="0 0 50 50"><use href="#f-rose"/></svg></span>
+      <span class="bloom-petal" style="--d:10s;--delay:2s;  top:22%; left:62%;"><svg viewBox="0 0 50 50"><use href="#f-rose"/></svg></span>
+      <span class="bloom-petal" style="--d:11s;--delay:2.4s;top:66%; left:60%;"><svg viewBox="0 0 50 50"><use href="#f-marigold"/></svg></span>
+      <span class="bloom-petal" style="--d:9s; --delay:2.8s;top:28%; left:82%;"><svg viewBox="0 0 50 50"><use href="#f-blossom"/></svg></span>
+      <span class="bloom-petal" style="--d:10s;--delay:3.2s;top:68%; left:84%;"><svg viewBox="0 0 50 50"><use href="#f-rose"/></svg></span>
+    </div>
+
+    <span class="mark glow-pulse">&ldquo;</span>
+    <blockquote>
+      Two souls, one journey.<br>Two families, one celebration.
+    </blockquote>
+    <cite>— with blessings from the Mathurs</cite>
+  </section>
+
+  <!-- ============== LETTER ============== -->
+  <section class="section reveal" id="letter">
+    <div class="sparkle-field" id="letterSparkles" aria-hidden="true"></div>
+    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
+    <svg class="mandala-watermark tl" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="mandala-watermark br" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="jaali-side left" aria-hidden="true"><use href="#jaali"/></svg>
+    <svg class="jaali-side right" aria-hidden="true"><use href="#jaali"/></svg>
+    <svg class="kalash-left" aria-hidden="true"><use href="#kalash"/></svg>
+    <svg class="kalash-right" aria-hidden="true"><use href="#kalash"/></svg>
+    <div class="section-eyebrow">A note from the families</div>
+    <h2 class="section-title">An Invitation to Our Joy</h2>
+    <div class="section-ornament">
+      <span class="line"></span>
+      <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#B08A4A"/></svg>
+      <span class="line"></span>
+    </div>
+
+    <div class="letter-wrap">
+      <svg class="letter-corner lc-tl" viewBox="0 0 300 300" aria-hidden="true">
+        <g fill="none" stroke="#6C8C5E" stroke-width="1.5" stroke-linecap="round"><path d="M10,10 C 70,70 110,120 160,200"/></g>
+        <g fill="#6C8C5E"><ellipse cx="60" cy="60" rx="14" ry="5" transform="rotate(45 60 60)"/><ellipse cx="110" cy="120" rx="16" ry="6" transform="rotate(55 110 120)"/></g>
+        <g><circle cx="80" cy="45" r="10" fill="#E85A7A"/><circle cx="76" cy="52" r="6" fill="#F6B5A3"/><circle cx="150" cy="120" r="11" fill="#E8A33D"/></g>
+      </svg>
+      <svg class="letter-corner lc-br" viewBox="0 0 300 300" aria-hidden="true">
+        <g fill="none" stroke="#6C8C5E" stroke-width="1.5" stroke-linecap="round"><path d="M10,10 C 70,70 110,120 160,200"/></g>
+        <g fill="#6C8C5E"><ellipse cx="60" cy="60" rx="14" ry="5" transform="rotate(45 60 60)"/></g>
+        <g><circle cx="80" cy="45" r="9" fill="#E85A7A"/><circle cx="150" cy="120" r="10" fill="#E8A33D"/></g>
+      </svg>
+
+      <div class="letter">
+        <p class="salutation">Dear Family &amp; Friends,</p>
+        <p class="body">With hearts full of joy and gratitude, we invite you to witness and bless the sacred union of our beloved <em>Pooja</em> and <em>Aman</em>.</p>
+        <p class="body"><em>"Surrounded by sacred fire, eternal vows, and beloved families, two souls unite in lifelong devotion and joy."</em></p>
+        <p class="body">We would be honoured to have you by our side as we celebrate the beginning of their forever — under auspicious shaadi skies, in the city of Jodhpur.</p>
+        <p class="signature">With love &amp; blessings</p>
+        <p class="family">The Mathur Families</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Paisley divider -->
+  <div class="ornament-divider" aria-hidden="true">
+    <svg viewBox="0 0 360 40">
+      <g fill="none" stroke="#B08A4A" stroke-width="1" stroke-linecap="round">
+        <line x1="10" y1="20" x2="130" y2="20" opacity=".4"/>
+        <line x1="230" y1="20" x2="350" y2="20" opacity=".4"/>
+        <!-- paisley left -->
+        <path d="M 130,20 C 140,8 160,8 170,20 C 160,32 140,32 130,20 Z" fill="#B08A4A" opacity=".4" stroke="none"/>
+        <path d="M 170,20 C 175,16 180,16 182,20" opacity=".6"/>
+        <!-- paisley right -->
+        <path d="M 230,20 C 220,8 200,8 190,20 C 200,32 220,32 230,20 Z" fill="#B08A4A" opacity=".4" stroke="none"/>
+        <path d="M 190,20 C 185,16 180,16 178,20" opacity=".6"/>
+        <!-- center diamond -->
+        <path d="M 180,10 L 186,20 L 180,30 L 174,20 Z" fill="#E85A7A" stroke="none"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ============== CELEBRATION PATH ============== -->
+  <section class="section warm reveal" id="celebration-path">
+    <div class="sparkle-field" id="pathSparkles" aria-hidden="true"></div>
+    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
+    <svg class="peacock-left" aria-hidden="true"><use href="#peacock-feather"/></svg>
+    <svg class="peacock-right" aria-hidden="true"><use href="#peacock-feather"/></svg>
+    <div class="section-eyebrow">The Weekend Ahead</div>
+    <h2 class="section-title">Our Celebration Path</h2>
+    <div class="section-ornament">
+      <span class="line"></span>
+      <svg viewBox="0 0 20 20"><path d="M10 2 L13 8 L19 10 L13 12 L10 18 L7 12 L1 10 L7 8 Z" fill="#E8A33D"/></svg>
+      <span class="line"></span>
+    </div>
+    <p class="section-sub">Two days, four cherished gatherings. Here's how we'll move forward together — from the first blessing to the final vow.</p>
+
+    <svg class="mandala-watermark tl" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="mandala-watermark br" aria-hidden="true"><use href="#mandala"/></svg>
+
+    <div class="path-wrap">
+      <!-- Day 1 -->
+      <div class="path-day">
+        <div class="day-badge"><span class="d-num">24</span><span class="d-mo">Tue · Nov</span></div>
+        <div class="day-body">
+          <div class="day-head">
+            <span class="d-tag">Shubh Aarambh —</span>
+            <h3 class="d-title">Day One</h3>
+            <span class="d-meta">The day of beginnings. Prayers at dawn, turmeric at noon, and music that spills into the night.</span>
+          </div>
+          <div class="path-stops">
+            <!-- Baane Vinayak -->
+            <div class="stop vinayak">
+              <svg class="mehndi" aria-hidden="true"><use href="#mehndi-corner"/></svg>
+              <div class="stop-icon">
+                <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                  <circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="11"/>
+                  <path d="M24 8 L24 40 M8 24 L40 24 M12 12 L36 36 M36 12 L12 36" opacity=".5"/>
+                  <circle cx="24" cy="24" r="4" fill="currentColor" stroke="none"/>
+                </svg>
+              </div>
+              <div class="ribbon">Shubh Aarambh</div>
+              <div class="t">9:00 AM</div>
+              <h4>Baane Vinayak</h4>
+              <p>With Lord Ganesha's blessings — the week begins in prayer, sweets, and the first smiles of the celebration.</p>
+            </div>
+
+            <!-- Haldi -->
+            <div class="stop haldi">
+              <svg class="mehndi" aria-hidden="true"><use href="#mehndi-corner"/></svg>
+              <div class="stop-icon">
+                <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <path d="M 10,26 Q 24,42 38,26 L 38,24 L 10,24 Z" fill="currentColor" opacity=".2"/>
+                  <path d="M 10,24 L 38,24"/><path d="M 10,26 Q 24,42 38,26"/>
+                  <path d="M 24,22 L 24,8" stroke-width="1.6"/>
+                  <path d="M 20,8 Q 24,2 28,8 L 28,16 Q 24,14 20,16 Z" fill="currentColor" opacity=".5"/>
+                  <circle cx="14" cy="18" r="1.5" fill="currentColor"/><circle cx="36" cy="16" r="1.8" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="ribbon">Golden Afternoon</div>
+              <div class="t">1:00 PM</div>
+              <h4>Haldi</h4>
+              <p>Turmeric paste, laughter that doesn't stop, and every single golden stain worn as a blessing from someone who loves them.</p>
+            </div>
+
+            <!-- Engagement & Sangeet -->
+            <div class="stop sangeet">
+              <svg class="mehndi" aria-hidden="true"><use href="#mehndi-corner"/></svg>
+              <div class="stop-icon">
+                <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <ellipse cx="24" cy="26" rx="14" ry="4" fill="currentColor" opacity=".2"/>
+                  <path d="M 10,26 L 10,34 Q 24,38 38,34 L 38,26"/>
+                  <ellipse cx="24" cy="26" rx="14" ry="4"/>
+                  <path d="M 32,10 L 32,20 A 2.5 2.5 0 1 1 29.5,17.5 L 29.5,12 L 38,10 L 38,18 A 2.5 2.5 0 1 1 35.5,15.5" fill="currentColor" opacity=".7"/>
+                </svg>
+              </div>
+              <div class="ribbon">Rhythm &amp; Vows</div>
+              <div class="t">8:00 PM</div>
+              <h4>Engagement &amp; Sangeet</h4>
+              <p>A musical night of dance, promises exchanged over songs, and two families finally becoming one big, loud, loving story.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 2 -->
+      <div class="path-day">
+        <div class="day-badge"><span class="d-num">25</span><span class="d-mo">Wed · Nov</span></div>
+        <div class="day-body">
+          <div class="day-head">
+            <span class="d-tag">The Sacred Union —</span>
+            <h3 class="d-title">Day Two</h3>
+            <span class="d-meta">The day of forever. Under auspicious shaadi skies, around the sacred fire — seven vows, one lifetime.</span>
+          </div>
+          <div class="path-stops">
+            <div class="stop hilite">
+              <svg class="mehndi" aria-hidden="true"><use href="#mehndi-corner"/></svg>
+              <div class="stop-icon">
+                <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <path d="M 10,42 L 10,22" stroke-width="2"/><path d="M 38,42 L 38,22" stroke-width="2"/>
+                  <path d="M 10,22 C 20,12 28,12 38,22" opacity=".7"/>
+                  <path d="M 10,42 L 38,42" stroke-width="1.6"/>
+                  <path d="M 24,36 C 20,30 22,24 24,20 C 26,24 28,30 24,36 Z" fill="#FF7A3D" stroke="none"/>
+                  <path d="M 24,34 C 22,30 23,26 24,24 C 25,26 26,30 24,34 Z" fill="#FFB24A" stroke="none"/>
+                </svg>
+              </div>
+              <div class="ribbon">Saat Phere</div>
+              <div class="t">9:00 PM</div>
+              <h4>Wedding Ceremony</h4>
+              <p>Seven vows around the sacred fire. Family, friends, and the whole of Jodhpur's night sky bearing witness as two souls become one.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Paisley divider -->
+  <div class="ornament-divider" aria-hidden="true">
+    <svg viewBox="0 0 360 40">
+      <g fill="none" stroke="#B08A4A" stroke-width="1" stroke-linecap="round">
+        <line x1="10" y1="20" x2="130" y2="20" opacity=".4"/>
+        <line x1="230" y1="20" x2="350" y2="20" opacity=".4"/>
+        <path d="M 130,20 C 140,8 160,8 170,20 C 160,32 140,32 130,20 Z" fill="#B08A4A" opacity=".4" stroke="none"/>
+        <path d="M 230,20 C 220,8 200,8 190,20 C 200,32 220,32 230,20 Z" fill="#B08A4A" opacity=".4" stroke="none"/>
+        <path d="M 180,10 L 186,20 L 180,30 L 174,20 Z" fill="#E85A7A" stroke="none"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ============== SAVE THE DATE / COUNTDOWN ============== -->
+  <section class="section reveal" id="countdown">
+    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
+    <svg class="mandala-watermark tl" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="mandala-watermark br" aria-hidden="true"><use href="#mandala"/></svg>
+    <!-- swinging diyas -->
+    <svg class="diya-float" style="top:40px; left:8%;" aria-hidden="true"><use href="#diya"/></svg>
+    <svg class="diya-float" style="top:40px; right:8%; animation-delay:-2s;" aria-hidden="true"><use href="#diya"/></svg>
+    <div class="section-eyebrow">Save the Date</div>
+    <h2 class="section-title">Wednesday, 25 November 2026</h2>
+    <div class="section-ornament">
+      <span class="line"></span>
+      <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#E85A7A"/></svg>
+      <span class="line"></span>
+    </div>
+    <p class="section-sub">Jodhpur · 9:00 PM IST — the moment when two souls become one.</p>
+
+    <div class="countdown" id="cd" role="timer" aria-live="polite">
+      <div class="cd-tile"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Days</span></div>
+      <div class="cd-tile"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">Hours</span></div>
+      <div class="cd-tile"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">Minutes</span></div>
+      <div class="cd-tile"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Seconds</span></div>
+    </div>
+
+  </section>
+
+  <section class="section reveal" id="itinerary" hidden style="display:none">
+    <div class="section-eyebrow">The Celebration</div>
+    <h2 class="section-title">Wedding Itinerary</h2>
+    <div class="section-ornament">
+      <span class="line"></span>
+      <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#E8A33D"/></svg>
+      <span class="line"></span>
+    </div>
+    <p class="section-sub">Four cherished gatherings leading up to the sacred ceremony. We hope you'll join us for all of them.</p>
+
+    <div class="itinerary">
+      <!-- 1. Baane Vinayak — Ganesha-inspired mandala -->
+      <article class="event event-vinayak">
+        <div class="ev-icon">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <circle cx="24" cy="24" r="16"/>
+            <circle cx="24" cy="24" r="11"/>
+            <path d="M24 8 L24 40 M8 24 L40 24 M12 12 L36 36 M36 12 L12 36" opacity=".5"/>
+            <circle cx="24" cy="24" r="4" fill="currentColor" stroke="none"/>
+            <circle cx="24" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="24" cy="36" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="24" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="36" cy="24" r="1.5" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <div class="ev-ribbon">Shubh Aarambh</div>
+        <div class="ev-time">Tue · 24 Nov · 9:00 AM</div>
+        <h3>Baane Vinayak</h3>
+        <p class="ev-desc">With the blessings of Lord Ganesha, our celebrations begin — the first prayer, the first sweet, the first smile of the week.</p>
+        <div class="ev-venue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Venue to be confirmed, Jodhpur</span></div>
+      </article>
+
+      <!-- 2. Haldi — turmeric brush + splashes -->
+      <article class="event event-haldi">
+        <div class="ev-icon">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <!-- bowl -->
+            <path d="M 10,26 Q 24,42 38,26 L 38,24 L 10,24 Z" fill="currentColor" opacity=".2"/>
+            <path d="M 10,24 L 38,24"/>
+            <path d="M 10,26 Q 24,42 38,26"/>
+            <!-- brush handle -->
+            <path d="M 24,22 L 24,8" stroke-width="1.6"/>
+            <path d="M 20,8 Q 24,2 28,8 L 28,16 Q 24,14 20,16 Z" fill="currentColor" opacity=".5"/>
+            <!-- drops -->
+            <circle cx="14" cy="18" r="1.5" fill="currentColor"/>
+            <circle cx="36" cy="16" r="1.8" fill="currentColor"/>
+            <circle cx="40" cy="22" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="ev-ribbon">Golden Afternoon</div>
+        <div class="ev-time">Tue · 24 Nov · 1:00 PM</div>
+        <h3>Haldi</h3>
+        <p class="ev-desc">A radiant afternoon of turmeric, laughter and the warmest wishes — where every stain becomes a blessing worn with joy.</p>
+        <div class="ev-venue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Venue to be confirmed, Jodhpur</span></div>
+      </article>
+
+      <!-- 3. Sangeet — dhol + music notes -->
+      <article class="event event-sangeet">
+        <div class="ev-icon">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <!-- dhol body -->
+            <ellipse cx="24" cy="26" rx="14" ry="4" fill="currentColor" opacity=".2"/>
+            <path d="M 10,26 L 10,34 Q 24,38 38,34 L 38,26"/>
+            <ellipse cx="24" cy="26" rx="14" ry="4"/>
+            <ellipse cx="24" cy="34" rx="14" ry="4" opacity=".4"/>
+            <path d="M 10,30 L 14,28 M 14,28 L 10,32 M 38,30 L 34,28 M 34,28 L 38,32" opacity=".55"/>
+            <!-- music note -->
+            <path d="M 32,10 L 32,20 A 2.5 2.5 0 1 1 29.5,17.5 L 29.5,12 L 38,10 L 38,18 A 2.5 2.5 0 1 1 35.5,15.5" fill="currentColor" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="ev-ribbon">Rhythm &amp; Vows</div>
+        <div class="ev-time">Tue · 24 Nov · 8:00 PM</div>
+        <h3>Engagement &amp; Sangeet</h3>
+        <p class="ev-desc">A musical night of dance, promises and both families coming together as one — the night the whole family becomes one big story.</p>
+        <div class="ev-venue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Venue to be confirmed, Jodhpur</span></div>
+      </article>
+
+      <!-- 4. Wedding — mandap with sacred fire -->
+      <article class="event event-wedding">
+        <div class="ev-icon">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <!-- mandap pillars + arch -->
+            <path d="M 10,42 L 10,22" stroke-width="2"/>
+            <path d="M 38,42 L 38,22" stroke-width="2"/>
+            <path d="M 10,22 C 20,12 28,12 38,22" opacity=".7"/>
+            <path d="M 10,42 L 38,42" stroke-width="1.6"/>
+            <!-- fire -->
+            <path d="M 24,36 C 20,30 22,24 24,20 C 26,24 28,30 24,36 Z" fill="#FF7A3D" stroke="none"/>
+            <path d="M 24,34 C 22,30 23,26 24,24 C 25,26 26,30 24,34 Z" fill="#FFB24A" stroke="none"/>
+            <path d="M 24,32 C 23,30 23,28 24,26 C 25,28 25,30 24,32 Z" fill="#FFD98A" stroke="none"/>
+          </svg>
+        </div>
+        <div class="ev-ribbon">The Sacred Union</div>
+        <div class="ev-time">Wed · 25 Nov · 9:00 PM</div>
+        <h3>Wedding Ceremony</h3>
+        <p class="ev-desc">The sacred union — seven vows exchanged around the holy fire, under auspicious shaadi skies, with everyone they love bearing witness.</p>
+        <div class="ev-venue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Kayasth Samudaiyak Bhawan, 17 Sector, Jodhpur</span></div>
+      </article>
+    </div>
+  </section>
+
+  <div class="ornament-divider" aria-hidden="true">
+    <svg viewBox="0 0 360 40">
+      <g fill="none" stroke="#B08A4A" stroke-width="1" stroke-linecap="round">
+        <line x1="10" y1="20" x2="130" y2="20" opacity=".4"/>
+        <line x1="230" y1="20" x2="350" y2="20" opacity=".4"/>
+        <path d="M 130,20 C 140,8 160,8 170,20 C 160,32 140,32 130,20 Z" fill="#6C8C5E" opacity=".4" stroke="none"/>
+        <path d="M 230,20 C 220,8 200,8 190,20 C 200,32 220,32 230,20 Z" fill="#6C8C5E" opacity=".4" stroke="none"/>
+        <path d="M 180,10 L 186,20 L 180,30 L 174,20 Z" fill="#E85A7A" stroke="none"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ============== VENUE ============== -->
+  <section class="section reveal" id="venue">
+    <div class="sparkle-field" id="venueSparkles" aria-hidden="true"></div>
+    <svg class="mandala-watermark tl" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="mandala-watermark br" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="jaali-side left" aria-hidden="true"><use href="#jaali"/></svg>
+    <svg class="jaali-side right" aria-hidden="true"><use href="#jaali"/></svg>
+    <div class="section-eyebrow">The Celebration Awaits</div>
+    <h2 class="section-title">The Venue</h2>
+    <div class="section-ornament">
+      <span class="line"></span>
+      <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#6C8C5E"/></svg>
+      <span class="line"></span>
+    </div>
+
+    <div class="venue-card">
+      <!-- Rajasthani jharokha window silhouette -->
+      <svg class="v-arch" viewBox="0 0 360 260" aria-hidden="true">
+        <defs>
+          <linearGradient id="sandstone" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#C4832E" stop-opacity=".45"/>
+            <stop offset="100%" stop-color="#8E5A1E" stop-opacity=".25"/>
+          </linearGradient>
+          <linearGradient id="innerArch" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FBF6EE" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#F3E3BF" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+        <!-- base platform -->
+        <rect x="20" y="240" width="320" height="14" fill="url(#sandstone)"/>
+        <!-- outer frame -->
+        <path d="M 40,240 L 40,110 C 40,60 180,20 180,20 C 180,20 320,60 320,110 L 320,240 Z" fill="url(#sandstone)"/>
+        <!-- scalloped inner arch (cusped / mughal) -->
+        <path d="M 70,240 L 70,120
+                 Q 70,90 90,85
+                 Q 100,70 115,75
+                 Q 130,55 150,65
+                 Q 165,45 180,55
+                 Q 195,45 210,65
+                 Q 230,55 245,75
+                 Q 260,70 270,85
+                 Q 290,90 290,120
+                 L 290,240 Z" fill="url(#innerArch)"/>
+        <!-- side mini-pillars -->
+        <rect x="30" y="130" width="12" height="110" fill="#8E5A1E" opacity=".55"/>
+        <rect x="318" y="130" width="12" height="110" fill="#8E5A1E" opacity=".55"/>
+        <circle cx="36" cy="128" r="9" fill="#8E5A1E" opacity=".55"/>
+        <circle cx="324" cy="128" r="9" fill="#8E5A1E" opacity=".55"/>
+        <!-- chhatri dome crown -->
+        <path d="M 150,30 C 150,0 210,0 210,30 L 210,38 L 150,38 Z" fill="#B08A4A" opacity=".55"/>
+        <circle cx="180" cy="12" r="5" fill="#8E5A1E"/>
+        <path d="M 180,2 L 180,10" stroke="#8E5A1E" stroke-width="2"/>
+        <!-- garland hanging across arch -->
+        <path d="M 80,135 C 150,170 210,170 280,135" fill="none" stroke="#6C8C5E" stroke-width="1.8" opacity=".65"/>
+        <g>
+          <circle cx="110" cy="155" r="5" fill="#E8A33D"/>
+          <circle cx="140" cy="166" r="6" fill="#E85A7A"/>
+          <circle cx="180" cy="170" r="6" fill="#E8A33D"/>
+          <circle cx="220" cy="166" r="6" fill="#E85A7A"/>
+          <circle cx="250" cy="155" r="5" fill="#E8A33D"/>
+        </g>
+        <!-- small decorative diyas on platform -->
+        <ellipse cx="80" cy="250" rx="10" ry="3" fill="#8E6A33" opacity=".7"/>
+        <path d="M 80,246 L 80,238" stroke="#FFB24A" stroke-width="2"/>
+        <circle cx="80" cy="236" r="3" fill="#FFB24A"/>
+        <ellipse cx="280" cy="250" rx="10" ry="3" fill="#8E6A33" opacity=".7"/>
+        <path d="M 280,246 L 280,238" stroke="#FFB24A" stroke-width="2"/>
+        <circle cx="280" cy="236" r="3" fill="#FFB24A"/>
+      </svg>
+
+      <h3 class="v-name">Kayasth Samudaiyak Bhawan</h3>
+      <p class="v-addr">17 Sector, Jodhpur, Rajasthan<br>Wednesday · 25 November 2026 · 9:00 PM</p>
+      <a class="btn" href="https://maps.app.goo.gl/FvuUGwYuZJWUGgwP9" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Get Directions
+      </a>
+    </div>
+  </section>
+
+  <!-- ============== A MESSAGE FOR YOU (interactive sealed letter) ============== -->
+  <section class="wish-section reveal" id="wish">
+    <div class="sparkle-field" id="wishSparkles" aria-hidden="true"></div>
+    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
+    <svg class="peacock-left" aria-hidden="true"><use href="#peacock-feather"/></svg>
+    <svg class="peacock-right" aria-hidden="true"><use href="#peacock-feather"/></svg>
+    <svg class="mandala-watermark tl" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="mandala-watermark br" aria-hidden="true"><use href="#mandala"/></svg>
+    <svg class="diya-float" style="top:60px; left:5%;" aria-hidden="true"><use href="#diya"/></svg>
+    <svg class="diya-float" style="top:60px; right:5%; animation-delay:-2.4s;" aria-hidden="true"><use href="#diya"/></svg>
+    <div class="section-eyebrow">Before You Go</div>
+    <h2 class="section-title">A Note for You</h2>
+    <div class="section-ornament">
+      <span class="line"></span>
+      <svg viewBox="0 0 20 20"><path d="M10 17 C 2 10 4 3 10 7 C 16 3 18 10 10 17 Z" fill="#E85A7A"/></svg>
+      <span class="line"></span>
+    </div>
+    <p class="section-sub">A little letter from Pooja &amp; Aman waits inside this envelope. Tap it to open.</p>
+
+    <div class="wish-wrap">
+      <button type="button" class="wish-envelope" id="wishEnv" aria-expanded="false" aria-controls="wishLetter" aria-label="Open letter from Pooja and Aman">
+        <div class="env-body"></div>
+        <div class="env-letter" id="wishLetter">
+          <div class="env-letter-inner">
+            <span class="lead">Dear One,</span>
+            Weddings are made of blessings — and yours would mean the world to us.<br>
+            <br>
+            Come, sit in the front row of our joy. Dance a little louder, laugh a little harder, hold our hands as we take these seven steps.<br>
+            <br>
+            <em>Your presence is the only gift we are asking for.</em><br>
+            <br>
+            <span style="font-family:'Dancing Script',cursive; color:var(--bougain); font-size:20px; font-style:normal;">— Pooja &amp; Aman</span>
+          </div>
+        </div>
+        <div class="env-flap"></div>
+        <div class="env-seal glow-pulse" aria-hidden="true">
+          <svg viewBox="0 0 68 68">
+            <defs>
+              <radialGradient id="wSeal" cx="40%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#D44761"/>
+                <stop offset="100%" stop-color="#8A1A2F"/>
+              </radialGradient>
+            </defs>
+            <circle cx="34" cy="34" r="30" fill="url(#wSeal)"/>
+            <circle cx="34" cy="34" r="26" fill="none" stroke="#D7B872" stroke-width="1" opacity=".7"/>
+            <text x="34" y="43" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="22" font-style="italic" fill="#F8E6B8">P&amp;A</text>
+          </svg>
+        </div>
+        <div class="env-hint">Tap to open ✨</div>
+      </button>
+    </div>
+
+    <p class="wish-note">With love from Jodhpur — see you on the twenty-fifth.</p>
+  </section>
+
+  <!-- ============== CLOSING ============== -->
+  <section class="closing reveal" id="closing">
+    <div class="sparkle-field" id="closingSparkles" aria-hidden="true"></div>
+    <svg class="toran" aria-hidden="true"><use href="#toran"/></svg>
+    <svg class="mandala-watermark tl" aria-hidden="true" style="top:60px; opacity:.07;"><use href="#mandala"/></svg>
+    <svg class="mandala-watermark br" aria-hidden="true" style="bottom:40px; opacity:.07;"><use href="#mandala"/></svg>
+    <svg class="kalash-left" aria-hidden="true"><use href="#kalash"/></svg>
+    <svg class="kalash-right" aria-hidden="true"><use href="#kalash"/></svg>
+    <svg class="diya-float" style="top:70px; left:12%;" aria-hidden="true"><use href="#diya"/></svg>
+    <svg class="diya-float" style="top:70px; right:12%; animation-delay:-2.2s;" aria-hidden="true"><use href="#diya"/></svg>
+    <svg class="closing-arch" viewBox="0 0 900 300" aria-hidden="true">
+      <g fill="none" stroke="#6C8C5E" stroke-width="1.6" stroke-linecap="round">
+        <path d="M100,280 C 200,120 350,40 450,40 C 550,40 700,120 800,280"/>
+        <path d="M140,280 C 220,160 360,80 450,80 C 540,80 680,160 760,280" opacity=".6"/>
+      </g>
+      <g fill="#6C8C5E">
+        <ellipse cx="180" cy="210" rx="22" ry="8" transform="rotate(-40 180 210)"/>
+        <ellipse cx="230" cy="160" rx="22" ry="8" transform="rotate(-55 230 160)"/>
+        <ellipse cx="310" cy="100" rx="22" ry="8" transform="rotate(-70 310 100)"/>
+        <ellipse cx="590" cy="100" rx="22" ry="8" transform="rotate(70 590 100)"/>
+        <ellipse cx="670" cy="160" rx="22" ry="8" transform="rotate(55 670 160)"/>
+        <ellipse cx="720" cy="210" rx="22" ry="8" transform="rotate(40 720 210)"/>
+      </g>
+      <g>
+        <circle cx="200" cy="190" r="12" fill="#E85A7A"/><circle cx="280" cy="120" r="14" fill="#E85A7A"/>
+        <circle cx="360" cy="70" r="12" fill="#E8A33D"/><circle cx="540" cy="70" r="12" fill="#E8A33D"/>
+        <circle cx="620" cy="120" r="14" fill="#E85A7A"/><circle cx="700" cy="190" r="12" fill="#E85A7A"/>
+        <circle cx="450" cy="40" r="10" fill="#B08A4A"/>
+      </g>
+    </svg>
+
+    <div style="position:relative; z-index:2; max-width:720px; margin:0 auto;">
+      <div class="section-eyebrow">Until We Meet</div>
+      <h2>Come, Celebrate with Us</h2>
+      <div class="section-ornament">
+        <span class="line"></span>
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4" fill="#B08A4A"/></svg>
+        <span class="line"></span>
+      </div>
+      <p class="section-sub">Your presence is the greatest blessing we could ask for. Together, let's turn this day into a memory to treasure forever.</p>
+      <p class="couple">— Pooja &amp; Aman —</p>
+      <p class="rsvp">For RSVP &amp; details, please contact the family.</p>
+      <p class="footer-note">Under Auspicious Shaadi Skies · Jodhpur 2026</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const cover = document.getElementById('cover');
+  const skip  = document.getElementById('skipBtn');
+  const landing = document.getElementById('landing');
+  const hero = document.getElementById('heroName');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const seen = sessionStorage.getItem('pa-intro-seen') === '1';
+  const mobile = window.matchMedia('(max-width:640px)').matches;
+
+  /* ---------- Flower generator ---------- */
+  // Red roses dominate (Indian wedding staple), then marigold and others
+  const FLOWER_IDS = [
+    'f-red-rose','f-red-rose','f-red-rose','f-rose-petal','f-rose-petal',
+    'f-marigold','f-marigold','f-rose','f-blossom','f-bougain'
+  ];
+  const rand = (a,b) => a + Math.random() * (b - a);
+
+  function makeFlower({minDelay=0, maxDelay=6, sizeMin=18, sizeMax=36, dMin=9, dMax=16, opMin=.75, opMax=.95} = {}){
+    const el = document.createElement('div');
+    el.className = 'flower';
+    const type = FLOWER_IDS[Math.floor(Math.random()*FLOWER_IDS.length)];
+    const size = rand(sizeMin, sizeMax);
+    el.style.setProperty('--size',  size + 'px');
+    el.style.setProperty('--dur',   rand(dMin,dMax).toFixed(2) + 's');
+    el.style.setProperty('--delay', rand(minDelay,maxDelay).toFixed(2) + 's');
+    el.style.setProperty('--sway',  (rand(20,70) * (Math.random()<.5?-1:1)).toFixed(1) + 'px');
+    el.style.setProperty('--spin',  (rand(240,720) * (Math.random()<.5?-1:1)).toFixed(0) + 'deg');
+    el.style.setProperty('--op',    rand(opMin,opMax).toFixed(2));
+    el.style.setProperty('--z',     Math.random()<.4 ? 1 : 7);
+    el.style.left = rand(-2, 100).toFixed(1) + '%';
+    el.innerHTML = `<svg viewBox="0 0 50 50"><use href="#${type}"/></svg>`;
+    return el;
+  }
+
+  function populate(container, count, opts){
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) frag.appendChild(makeFlower(opts));
+    container.appendChild(frag);
+  }
+
+  const introHost = document.getElementById('introFlowers');
+  const blessHost = document.getElementById('blessFlowers');
+  // Dense shower during the intro reveal...
+  if (introHost && !reduced) populate(introHost, mobile ? 18 : 32, {minDelay:0, maxDelay:5, sizeMin:16, sizeMax:36, dMin:8, dMax:13});
+  // ...and a much more subtle, sparse continuous blessing layer on the landing
+  // (fewer, smaller, more transparent, slower — so content stays readable).
+  if (blessHost && !reduced) populate(blessHost, mobile ? 6 : 12, {minDelay:0, maxDelay:22, sizeMin:11, sizeMax:20, dMin:22, dMax:34, opMin:.3, opMax:.55});
+
+  function reveal(){
+    document.body.classList.add('revealed');
+    cover.setAttribute('aria-hidden','true');
+    landing.setAttribute('aria-hidden','false');
+    sessionStorage.setItem('pa-intro-seen','1');
+  }
+
+  function playIntro(){
+    // Timeline (ms):
+    // 0        cover fades in
+    // 300      card stage rises
+    // 1200     cover text appears
+    // 1800     wax seal lands
+    // 2600     seal cracks
+    // 3200     panels OPEN  (3s rotation)
+    // 5000     inner names visible
+    // 6600     cover gracefully exits
+    // 7800     landing fades up (clean, no overlap)
+    // Timeline:
+    // 0.0 – 1.5s  cover fades in, card rises, florals draw
+    // 1.5 – 2.4s  cover text + monogram land
+    // 2.4 – 6.0s  CLOSED card HOLDS visible so guests can read it
+    // 6.0s        panels start opening (3.6s slow glide)
+    // 7.4s        landing begins fading in BEHIND opening panels
+    // 7.6s        cover background fades to transparent
+    // 9.6s        panels fully open, card gracefully lifts & fades
+    // 10.8s       cover removed, landing settled
+    setTimeout(()=> cover.classList.add('stage-open'),         3500);
+    setTimeout(()=> document.body.classList.add('landing-in'), 4900);
+    setTimeout(()=> cover.classList.add('exiting'),            6900);
+    setTimeout(()=> { cover.style.display='none'; reveal(); }, 8300);
+    // Let the dense shower linger for ~15s after reveal, then fade over 10s
+    setTimeout(()=> document.body.classList.add('flowers-settle'), 8300 + 15000);
+  }
+
+  skip.addEventListener('click', () => {
+    cover.style.transition='opacity .5s ease';
+    cover.style.opacity='0';
+    setTimeout(()=>{ cover.style.display='none'; reveal(); }, 500);
+  });
+  window.addEventListener('keydown', e => { if(e.key==='Escape') skip.click(); });
+
+  if (reduced || seen) {
+    cover.style.display='none';
+    reveal();
+  } else {
+    playIntro();
+  }
+
+  /* ---------- Countdown to 25 Nov 2026, 21:00 IST (15:30 UTC) ---------- */
+  const TARGET = new Date('2026-11-25T15:30:00Z').getTime();
+  const pad = n => String(n).padStart(2,'0');
+  const cdD = document.getElementById('cd-d');
+  const cdH = document.getElementById('cd-h');
+  const cdM = document.getElementById('cd-m');
+  const cdS = document.getElementById('cd-s');
+  function tick(){
+    const now = Date.now();
+    let diff = Math.max(0, TARGET - now);
+    const d = Math.floor(diff / 86400000); diff -= d*86400000;
+    const h = Math.floor(diff / 3600000);  diff -= h*3600000;
+    const m = Math.floor(diff / 60000);    diff -= m*60000;
+    const s = Math.floor(diff / 1000);
+    if (cdD){ cdD.textContent = d; cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s); }
+  }
+  tick();
+  let tickTimer = setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', ()=>{
+    if (document.hidden){ clearInterval(tickTimer); }
+    else { tick(); tickTimer = setInterval(tick, 1000); }
+  });
+
+  /* ---------- .ics download ---------- */
+  const addCal = document.getElementById('addCal');
+  if (addCal){
+    const ics = [
+      'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Pooja&Aman//Wedding//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:pooja-aman-2026-wedding@mathur',
+      'DTSTAMP:20261101T000000Z',
+      'DTSTART:20261125T153000Z',
+      'DTEND:20261125T193000Z',
+      'SUMMARY:Pooja & Aman — Wedding Ceremony',
+      'LOCATION:Kayasth Samudaiyak Bhawan\\, 17 Sector\\, Jodhpur',
+      'DESCRIPTION:Join us as Pooja & Aman unite in marriage. 9:00 PM IST.',
+      'END:VEVENT','END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], {type:'text/calendar'});
+    addCal.href = URL.createObjectURL(blob);
+  }
+
+  /* ---------- Gold sparkle generator ---------- */
+  function makeSparkle(){
+    const el = document.createElement('span');
+    el.className = 'sparkle';
+    el.style.left = (Math.random() * 100).toFixed(1) + '%';
+    el.style.top  = (Math.random() * 100).toFixed(1) + '%';
+    el.style.setProperty('--d',     (2 + Math.random() * 2.5).toFixed(2) + 's');
+    el.style.setProperty('--delay', (Math.random() * 4).toFixed(2) + 's');
+    const scale = 0.6 + Math.random() * 1.2;
+    el.style.width  = (12 * scale) + 'px';
+    el.style.height = (12 * scale) + 'px';
+    return el;
+  }
+  function populateSparkles(container, count){
+    if (!container) return;
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) frag.appendChild(makeSparkle());
+    container.appendChild(frag);
+  }
+  if (!reduced){
+    populateSparkles(document.getElementById('heroSparkles'),       mobile ? 12 : 22);
+    populateSparkles(document.getElementById('pullquoteSparkles'),  mobile ? 10 : 16);
+    populateSparkles(document.getElementById('letterSparkles'),     mobile ? 8  : 14);
+    populateSparkles(document.getElementById('pathSparkles'),       mobile ? 10 : 18);
+    populateSparkles(document.getElementById('venueSparkles'),      mobile ? 8  : 14);
+    populateSparkles(document.getElementById('wishSparkles'),       mobile ? 10 : 16);
+    populateSparkles(document.getElementById('closingSparkles'),    mobile ? 10 : 16);
+  }
+
+  /* ---------- Interactive wish envelope ---------- */
+  const wishEnv = document.getElementById('wishEnv');
+  if (wishEnv){
+    wishEnv.addEventListener('click', () => {
+      const open = wishEnv.classList.toggle('open');
+      wishEnv.setAttribute('aria-expanded', String(open));
+      const hint = wishEnv.querySelector('.env-hint');
+      if (hint) hint.style.display = open ? 'none' : '';
+    });
+  }
+
+  /* ---------- Scroll-reveal ---------- */
+  const io = new IntersectionObserver((entries)=>{
+    for (const e of entries){
+      if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold:.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
